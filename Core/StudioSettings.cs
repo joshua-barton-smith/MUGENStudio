@@ -6,12 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace MUGENStudio
+namespace MUGENStudio.Core
 {
+    /// <summary>
+    /// contains settings for the editor and environment
+    /// </summary>
     public class StudioSettings
     {
-        
-        // list of previously opened projects
+
+        /// <summary>
+        /// list of previously opened projects
+        /// </summary>
         public List<(string, string)> PreviousProjects { get; }
 
         // internal xml document representation
@@ -19,6 +24,10 @@ namespace MUGENStudio
         // filepath when settings were initialized
         private readonly string xmlFile;
 
+        /// <summary>
+        /// loads settings from the path specified
+        /// </summary>
+        /// <param name="xmlFile">path to settings file</param>
         public StudioSettings(string xmlFile)
         {
             // save settings file name
@@ -43,8 +52,12 @@ namespace MUGENStudio
             }
         }
 
-        // Adds a project to the list of previous projects,
-        // and updates the charName if the project was already included and if it has changed  
+        /// <summary>
+        /// Adds a project to the list of previous projects,
+        /// and updates the charName if the project was already included and if it has changed  
+        /// </summary>
+        /// <param name="defFile">path to the DEF file for the project</param>
+        /// <param name="charName">name of the character loaded from this DEF</param>
         public void AddPreviousProject(string defFile, string charName)
         {
             // iterate through and remove if the defFile matches (charName need not match since it can update)
@@ -57,9 +70,16 @@ namespace MUGENStudio
             }
             // add to the beginning
             this.PreviousProjects.Insert(0, (defFile, charName));
+            // reduce to 5 projects for now
+            if (this.PreviousProjects.Count > 5)
+            {
+                this.PreviousProjects.RemoveRange(5, this.PreviousProjects.Count - 5);
+            }
         }
 
-        // writes current settings state out to the settings file
+        /// <summary>
+        /// writes current settings state out to the settings file
+        /// </summary>
         public void SaveSettings()
         {
             // reset the document

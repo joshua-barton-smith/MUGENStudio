@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{9322D7D7-6D5D-4699-A4EF-B792732EF257}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>MUGEN_Studio</RootNamespace>
+    <RootNamespace>MUGENStudio</RootNamespace>
     <AssemblyName>MUGEN Studio</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\MUGEN Studio.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,11 +35,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=6.0.1.278, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>packages\AvalonEdit.6.0.1\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -59,7 +64,11 @@
     </ApplicationDefinition>
     <Compile Include="Core\Util.cs" />
     <Compile Include="Core\StudioSettings.cs" />
-    <Page Include="Graphic\MainWindow.xaml">
+    <Page Include="Graphic\CodeEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Graphic\SelectProjectWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -68,13 +77,20 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\Globals.cs" />
-    <Compile Include="Graphic\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="Graphic\CodeEditorWindow.xaml.cs">
+      <DependentUpon>CodeEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Graphic\SelectProjectWindow.xaml.cs">
+      <DependentUpon>SelectProjectWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MugenParser\MugenCMD.cs" />
+    <Compile Include="MugenParser\MugenCNS.cs" />
     <Compile Include="MugenParser\MugenDefinition.cs" />
+    <Compile Include="MugenParser\MugenINI.cs" />
+    <Compile Include="MugenParser\MugenST.cs" />
     <Compile Include="MugenParser\SimpleINI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

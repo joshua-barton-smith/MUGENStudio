@@ -1,4 +1,4 @@
-﻿<Window x:Class="MUGENStudio.MainWindow"
+﻿<Window x:Class="MUGENStudio.Graphic.SelectProjectWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -13,4 +13,25 @@
 		<StackPanel x:Name="pastProjectPanel" HorizontalAlignment="Left" Height="206" Margin="50,178,0,0" VerticalAlignment="Top" Width="524"/>
 
 	</Grid>
+
+	<Window.Resources>
+		<Style TargetType="Label" x:Key="LabelWithHover">
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="Background">
+						<Setter.Value>
+							<LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+								<LinearGradientBrush.GradientStops>
+									<GradientStop Offset="0.0" Color="White" />
+									<GradientStop Offset="0.5" Color="#FFECECEC" />
+									<GradientStop Offset="1.0" Color="White" />
+								</LinearGradientBrush.GradientStops>
+							</LinearGradientBrush>
+						</Setter.Value>
+					</Setter>
+					<Setter Property="Cursor" Value="Hand"/>
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+	</Window.Resources>
 </Window>

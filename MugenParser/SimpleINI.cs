@@ -8,18 +8,33 @@ using System.Threading.Tasks;
 
 namespace MUGENStudio.MugenParser
 {
-    // very simple INI parser and representation, generates a List of sections
-    // and allows access to named sections.
-    // can store multiple sections with identical names and multiple identical keys.
+
+    /// <summary>
+    /// very simple INI parser and representation, generates a List of sections
+    /// and allows access to named sections.
+    /// can store multiple sections with identical names and multiple identical keys.
+    /// </summary>
     public class SimpleINI
     {
 
         private readonly List<SimpleINISection> sections;
 
-        public SimpleINI(string path)
+        /// <summary>
+        /// initialize a SimpleINI and parse a file
+        /// </summary>
+        /// <param name="path">path of the INI file to parse</param>
+        /// <param name="shouldCreate">indicates if a missing file should be created</param>
+        public SimpleINI(string path, bool shouldCreate)
         {
-            // check input
-            if (!File.Exists(path)) throw new FileNotFoundException(string.Format("INI file specified by {0} does not exist!", path));
+            // check input - fail if does not exist + should not create
+            if (!File.Exists(path) && !shouldCreate) throw new FileNotFoundException(string.Format("INI file specified by {0} does not exist!", path));
+            // create file + init this file blank if we can create it
+            if (!File.Exists(path))
+            {
+                File.Create(path);
+                sections = new List<SimpleINISection>();
+                return;
+            }
             // set up section list
             this.sections = new List<SimpleINISection>();
             // read by lines
@@ -123,9 +138,17 @@ namespace MUGENStudio.MugenParser
                     }
                 }
             }
+            if (currSection.Name != null)
+            {
+                sections.Add(currSection);
+            }
         }
 
-        // fetches the first section with a matching name
+        /// <summary>
+        /// fetches the first section with a matching name
+        /// </summary>
+        /// <param name="name">section name to find</param>
+        /// <returns>the contents of the section as a SimpleINISection</returns>
         public SimpleINISection GetSectionByName(string name)
         {
             foreach(SimpleINISection section in this.sections)
@@ -135,7 +158,11 @@ namespace MUGENStudio.MugenParser
             return null;
         }
 
-        // fetches a list of all sections with a matching name
+        /// <summary>
+        /// fetches a list of all sections with a matching name
+        /// </summary>
+        /// <param name="name">section name to find</param>
+        /// <returns>the contents of the section as a list of SimpleINISection</returns>
         public List<SimpleINISection> GetAllSectionsByName(string name)
         {
             List<SimpleINISection> results = new List<SimpleINISection>();
@@ -146,32 +173,49 @@ namespace MUGENStudio.MugenParser
             return results;
         }
 
-        // gets the section at a specific index
-        // currently does NO range checking!!!
+
+        /// <summary>
+        /// gets the section at a specific index
+        /// currently does NO range checking!!!
+        /// </summary>
+        /// <param name="position">position to read from</param>
+        /// <returns>the SimpleINISection matching that position</returns>
         public SimpleINISection GetSectionByPosition(int position)
         {
             return this.sections[position];
         }
 
-        // fetches a key from a specific section in the INI file.
-        // if more than once section or key by that name exists,
-        // it fetches the first.
+
+        /// <summary>
+        /// fetches a key from a named section in the INI file.
+        /// if more than once section or key by that name exists,
+        /// it fetches the first.
+        /// </summary>
+        /// <param name="section">section name to find</param>
+        /// <param name="key">key to find</param>
+        /// <returns>value corresponding to the section and key</returns>
         public string GetNamedProperty(string section, string key)
         {
             return this.GetSectionByName(section).GetKVPair(key).Value;
         }
     }
 
-    // represents a single section in parsed INI, with a list of SimpleINIKV
+    /// <summary>
+    /// represents a single section in parsed INI, with a list of SimpleINIKV
+    /// </summary>
     public class SimpleINISection
     {
-        
-        // null constructor for checking
-        public SimpleINISection()
-        {
 
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public SimpleINISection() { }
 
+        /// <summary>
+        /// instantiate a section with no initial KV pairs
+        /// </summary>
+        /// <param name="name">section name</param>
+        /// <param name="position">position in the SimpleINI list, for quick reference</param>
         public SimpleINISection(string name, int position)
         {
             this.Name = name;
@@ -179,42 +223,78 @@ namespace MUGENStudio.MugenParser
             this.Keys = new List<SimpleINIKV>();
         }
 
-        // adds a KV pair to the list
+
+        /// <summary>
+        /// adds a KV pair to the list
+        /// </summary>
+        /// <param name="key">key to add</param>
+        /// <param name="value">corresponding value</param>
         public void AddKVPair(string key, string value)
         {
             this.Keys.Add(new SimpleINIKV(key, value));
         }
 
-        // fetches a single KV pair that matches the given key
+
+        /// <summary>
+        /// fetches a single KV pair that matches the given key
+        /// </summary>
+        /// <param name="key">key to fetch</param>
+        /// <returns>corresponding value</returns>
         public SimpleINIKV GetKVPair(string key)
         {
+            if (!this.Keys.Any(kv => kv.Key.Equals(key))) return null;
             return this.Keys.Find(kv => kv.Key.Equals(key));
         }
 
-        // fetches all KV pairs that match the given key
+        /// <summary>
+        /// fetches all KV pairs that match the given key
+        /// </summary>
+        /// <param name="key">key to fetch</param>
+        /// <returns>list of corresponding values</returns>
         public List<SimpleINIKV> GetAllKVPairs(string key)
         {
             return this.Keys.FindAll(kv => kv.Key.Equals(key));
         }
 
-        // name of the section (from section header)
+        /// <summary>
+        /// name of the section (from section header)
+        /// </summary>
         public string Name { get; }
-        // position of the section (count of sections from the start of the document)
+
+        /// <summary>
+        /// position of the section (count of sections from the start of the document)
+        /// </summary>
         public int Position { get; }
-        // all KV pairs in the section
+
+        /// <summary>
+        /// all KV pairs in the section
+        /// </summary>
         public List<SimpleINIKV> Keys { get; }
     }
 
-    // represents a single KV pair from the INI
+    /// <summary>
+    /// represents a single KV pair from the INI
+    /// </summary>
     public class SimpleINIKV
     {
+        /// <summary>
+        /// represents a single KV pair
+        /// </summary>
+        /// <param name="key">key for the pair</param>
+        /// <param name="value">corresponding value</param>
         public SimpleINIKV(string key, string value)
         {
             Key = key;
             Value = value;
         }
 
+        /// <summary>
+        /// Key for the pair
+        /// </summary>
         public string Key { get; }
+        /// <summary>
+        /// Value for the pair
+        /// </summary>
         public string Value { get; }
     }
 }
