@@ -50,14 +50,15 @@ namespace MUGENStudio.MugenParser
         /// <summary>
         /// Set of statefiles for the character, along with their numbering in the DEF
         /// </summary>
-        public Dictionary<string, MugenST> StFiles { get; }
+        public Dictionary<string, MugenST> StateFiles { get; }
 
         /// <summary>
         /// DEF file for the character
         /// </summary>
         /// <param name="path">path to the DEF file to load</param>
-        public MugenDefinition(string path) : base(path, false)
+        public MugenDefinition(string path) : base(path, Path.GetFileName(path), false)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             // populate relevant fields
 
             // 1. Info section
@@ -71,9 +72,63 @@ namespace MUGENStudio.MugenParser
             // files consists of:
             // singulars: cmd, cns, def, sprite, anim, sound, ai, stcommon
             // multiple state files st + st0~9
-            this.CmdFile = new MugenCMD(this.RelativePathToDef(path, this.GetValueWithFallback("Files", "cmd", "blank.cmd")));
+            this.CmdFile = new MugenCMD(this.RelativePathToDef(path, this.GetValueWithFallback("Files", "cmd", "blank.cmd")), this.GetValueWithFallback("Files", "cmd", "blank.cmd"));
+            this.CnsFile = new MugenCNS(this.RelativePathToDef(path, this.GetValueWithFallback("Files", "cns", "blank.cns")), this.GetValueWithFallback("Files", "cns", "blank.cns"));
+            // determine if stcommon is default or overridden
+            bool usesDefaultCommon = this.GetValueWithFallback("Files", "stcommon", "common1.cns").Equals("common1.cns");
+            // if default, we can try and load the actual stcommon from a relative path
+            // if relative path is incorrect (due to folder structure or the project being outside of the MUGEN folder),
+            // we load an appropriate common1.cns for the mugenversion
+            if (usesDefaultCommon)
+            {
+                // try to find the actual common1.cns
+                if (File.Exists(string.Format("{0}/../../data/common1.cns", Path.GetDirectoryName(path)))) 
+                {
+                    // if it exists, load it
+                    this.CommonFile = new MugenST(string.Format("{0}/../../data/common1.cns", Path.GetDirectoryName(path)), "common1.cns [DEFAULT]");
+                } else
+                {
+                    // load an appropriate common1.cns for the mugenversion
+                    if (MugenVersion.Equals("1.0")) this.CommonFile = new MugenST("CommonFiles/V1Common.txt", "common1.cns [1.0 DEFAULT]");
+                    else if (MugenVersion.Equals("1.1")) this.CommonFile = new MugenST("CommonFiles/V11Common.txt", "common1.cns [1.1 DEFAULT]");
+                    else this.CommonFile = new MugenST("CommonFiles/WinCommon.txt", "common1.cns [WIN DEFAULT]");
+                }
+            } else
+            {
+                // load the override stcommon
+                this.CommonFile = new MugenST(this.RelativePathToDef(path, this.GetValueWithFallback("Files", "stcommon", "stcommon.st")), this.GetValueWithFallback("Files", "stcommon", "stcommon.st"));
+            }
+
+            // load st files
+            // st + st0~9 at most
+            // st seems to process first
+            this.StateFiles = new Dictionary<string, MugenST>();
+            if (this.GetValueWithFallback("Files", "st", null) != null)
+            {
+                this.StateFiles.Add("st", new MugenST(this.RelativePathToDef(path, this.GetValueWithFallback("Files", "st", null)), this.GetValueWithFallback("Files", "st", null)));
+            }
+            // loop the possible other statefiles
+            int i;
+            for (i = 0; i < 10; i++)
+            {
+                if (this.GetValueWithFallback("Files", string.Format("st{0}", i), null) == null)
+                {
+                    Trace.WriteLine(string.Format("No st file with index {0} in DEF file, ignoring", i));
+                } else
+                {
+                    this.StateFiles.Add(string.Format("st{0}", i), new MugenST(this.RelativePathToDef(path, this.GetValueWithFallback("Files", string.Format("st{0}", i), null)), this.GetValueWithFallback("Files", string.Format("st{0}", i), null)));
+                }
+            }
 
             // 3. Arcade section -- TODO
+
+            // validates the project, checks syntax errors, etc
+            this.ValidateProject();
+        }
+
+        private void ValidateProject()
+        {
+
         }
 
         private string RelativePathToDef(string defFile, string filePath)

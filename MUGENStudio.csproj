@@ -80,6 +80,7 @@
     <Compile Include="Graphic\CodeEditorWindow.xaml.cs">
       <DependentUpon>CodeEditorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Graphic\MugenTreeViewItem.cs" />
     <Compile Include="Graphic\SelectProjectWindow.xaml.cs">
       <DependentUpon>SelectProjectWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -117,6 +118,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CommonFiles\V11Common.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="CommonFiles\V1Common.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="CommonFiles\WinCommon.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

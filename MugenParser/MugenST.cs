@@ -15,7 +15,8 @@ namespace MUGENStudio.MugenParser
         /// parses + processes an input ST file
         /// </summary>
         /// <param name="path">ST file to process</param>
-        public MugenST(string path) : base(path)
+        /// <param name="fileKey">name of the file from the DEF</param>
+        public MugenST(string path, string fileKey) : base(path, fileKey)
         {
         }
     }

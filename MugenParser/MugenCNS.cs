@@ -15,7 +15,8 @@ namespace MUGENStudio.MugenParser
         /// parses + processes an input CNS file
         /// </summary>
         /// <param name="path">CNS file to process</param>
-        public MugenCNS(string path) : base(path)
+        /// <param name="fileKey">name of the file from the DEF</param>
+        public MugenCNS(string path, string fileKey) : base(path, fileKey)
         {
         }
     }

@@ -83,6 +83,7 @@ namespace MUGENStudio.Graphic
             {
                 // swap to the editor window
                 if (Globals.editor == null) Globals.editor = new CodeEditorWindow();
+                Globals.editor.ReloadTree();
                 Globals.editor.Show();
                 Application.Current.MainWindow = Globals.editor;
                 Application.Current.MainWindow.WindowState = WindowState.Maximized;
