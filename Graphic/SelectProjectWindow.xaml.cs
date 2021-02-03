@@ -83,6 +83,7 @@ namespace MUGENStudio.Graphic
             {
                 // swap to the editor window
                 if (Globals.editor == null) Globals.editor = new CodeEditorWindow();
+                // we have to reload tree after adding a new project since it might be delayed
                 Globals.editor.ReloadTree();
                 Globals.editor.Show();
                 Application.Current.MainWindow = Globals.editor;

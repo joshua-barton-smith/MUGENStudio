@@ -23,6 +23,9 @@ namespace MUGENStudio.MugenParser
         /// </summary>
         public string FileKey { get; }
 
+        /// <summary>
+        /// path to the file used to generate this object
+        /// </summary>
         public string FilePath { get; }
 
         /// <summary>
@@ -53,6 +56,7 @@ namespace MUGENStudio.MugenParser
             return this.backing.GetNamedProperty(section.ToLower(), key.ToLower());
         }
 
+        // gets the raw file contents
         internal string GetFileRawContents()
         {
             return File.ReadAllText(this.FilePath, Util.GetEncoding(this.FilePath));

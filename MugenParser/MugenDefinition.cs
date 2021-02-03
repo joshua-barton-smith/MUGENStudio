@@ -58,7 +58,6 @@ namespace MUGENStudio.MugenParser
         /// <param name="path">path to the DEF file to load</param>
         public MugenDefinition(string path) : base(path, Path.GetFileName(path), false)
         {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
             // populate relevant fields
 
             // 1. Info section
@@ -89,9 +88,9 @@ namespace MUGENStudio.MugenParser
                 } else
                 {
                     // load an appropriate common1.cns for the mugenversion
-                    if (MugenVersion.Equals("1.0")) this.CommonFile = new MugenST("CommonFiles/V1Common.txt", "common1.cns [1.0 DEFAULT]");
-                    else if (MugenVersion.Equals("1.1")) this.CommonFile = new MugenST("CommonFiles/V11Common.txt", "common1.cns [1.1 DEFAULT]");
-                    else this.CommonFile = new MugenST("CommonFiles/WinCommon.txt", "common1.cns [WIN DEFAULT]");
+                    if (MugenVersion.Equals("1.0")) this.CommonFile = new MugenST("TextResources/CommonFiles/V1Common.txt", "common1.cns [1.0 DEFAULT]");
+                    else if (MugenVersion.Equals("1.1")) this.CommonFile = new MugenST("TextResources/CommonFiles/V11Common.txt", "common1.cns [1.1 DEFAULT]");
+                    else this.CommonFile = new MugenST("TextResources/CommonFiles/WinCommon.txt", "common1.cns [WIN DEFAULT]");
                 }
             } else
             {
@@ -126,11 +125,13 @@ namespace MUGENStudio.MugenParser
             this.ValidateProject();
         }
 
+        // function to validate syntax/structure of files in the project
         private void ValidateProject()
         {
 
         }
 
+        // converts a filepath given in the DEF (e.g. `stcommon = mycommon.cns`) to an absolute path based on DEF file location
         private string RelativePathToDef(string defFile, string filePath)
         {
             string basePath = Path.GetDirectoryName(defFile);
