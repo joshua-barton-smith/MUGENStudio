@@ -1,10 +1,13 @@
 ﻿using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MUGENStudio.Core;
 using MUGENStudio.MugenParser;
+using MUGENStudio.MugenParser.Validation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -21,12 +24,14 @@ using System.Xml;
 
 namespace MUGENStudio.Graphic
 {
+
     /// <summary>
     /// Interaction logic for CodeEditorWindow.xaml
     /// </summary>
     public partial class CodeEditorWindow : Window
     {
         private readonly LinkedList<TabItem> closedTabs;
+        private CompletionWindow completionWindow;
         /// <summary>
         /// constructs the editor window
         /// </summary>
@@ -149,6 +154,10 @@ namespace MUGENStudio.Graphic
                         SyntaxHighlighting = HighlightingLoader.Load(iniReader, HighlightingManager.Instance)
                     };
 
+                    // setup for code completion
+                    if(Globals.settingsSingleton.EnableCodeCompletion) editor.TextArea.TextEntered += HandleEditorAutoCompletion;
+                    if (Globals.settingsSingleton.EnableCodeCompletion) editor.TextArea.TextEntering += HandleEditorAutoCompletionSubmit;
+
                     // insert the tab with the editor as its contents
                     TabItem newItem = new TabItem()
                     {
@@ -162,6 +171,336 @@ namespace MUGENStudio.Graphic
                     newItem.Focus();
                 }
             }
+        }
+
+        private void HandleEditorAutoCompletionSubmit(object sender, TextCompositionEventArgs e)
+        {
+            if (e.Text.Length > 0 && completionWindow != null)
+            {
+                if (e.Text[0] == ' ')
+                {
+                    // space inserts
+                    completionWindow.CompletionList.RequestInsertion(e);
+                }
+            }
+            // Do not set e.Handled=true.
+            // We still want to insert the character that was typed.
+        }
+
+        // autocompletion
+        private void HandleEditorAutoCompletion(object sender, TextCompositionEventArgs e)
+        {
+            if (completionWindow != null) return;
+            Globals.IsMultiEnumInput = false;
+            // fetch the input so far
+            string input = e.Text;
+            // fetch the tab text up to cursor position
+            TabItem currentTab = editorTabs.Items[editorTabs.SelectedIndex] as TabItem;
+            TextEditor editor = currentTab.Content as TextEditor;
+            string prevText = editor.Text.Substring(0, editor.CaretOffset);
+            // determine how we want to perform code completion
+            // scenarios:
+            // 1. autocomplete a section header
+            // 2. autocomplete a property LHS
+            // 3. autocomplete a controller type RHS
+            // in all of these we must ignore comments
+            int lineStart = prevText.LastIndexOf('\n') + 1;
+            string currLine = prevText.Substring(lineStart, prevText.Length - lineStart);
+            // move backwards on the line to determine the type
+            int end = currLine.Length - 1;
+            char[] lineChars = currLine.ToCharArray();
+            MugenCompletionItem.CompletionMode mode = MugenCompletionItem.CompletionMode.NONE; // switch for determining completion later
+            int tmprhs = 0;
+            int tmpeq = 0;
+            int start = 0; // used for updating code completion offsets
+            // iterate chars backwards
+            for( ; end >= 0; end--)
+            {
+                // current char
+                char curr = lineChars[end];
+                // if in no-found mode
+                if (mode == MugenCompletionItem.CompletionMode.NONE)
+                {
+                    // if find the end of a header
+                    if (curr == ']')
+                    {
+                        mode = MugenCompletionItem.CompletionMode.ABORT; // swap to no-match mode
+                        continue;
+                    }
+                    // if find the start of a header
+                    if (curr == '[')
+                    {
+                        mode = MugenCompletionItem.CompletionMode.SECTION_HEADER; // swap to header mode
+                        start = end + 1; // get start of the section header offset
+                    }
+                    // if find an = sign
+                    if (curr == '=')
+                    {
+                        mode = MugenCompletionItem.CompletionMode.PROPERTY_RHS; // swap to RHS mode
+                        tmprhs = end;
+                        tmpeq = end;
+                        while (lineChars[tmprhs] != '\n' && tmprhs > 0)
+                        {
+                            tmprhs--;
+                        }
+                    }
+                }
+                // if find a comment
+                if (curr == ';')
+                {
+                    // break regardless of previous mode
+                    mode = MugenCompletionItem.CompletionMode.ABORT;
+                    break;
+                }
+            }
+            if (mode == MugenCompletionItem.CompletionMode.NONE) mode = MugenCompletionItem.CompletionMode.PROPERTY_LHS; // LHS if no other mode matched
+            // header mode: provide valid list of headers
+            // hardcoded for now... should be based on filetype
+            if (mode == MugenCompletionItem.CompletionMode.SECTION_HEADER)
+            {
+                // initialize completion window
+                completionWindow = new CompletionWindow(editor.TextArea)
+                {
+                    StartOffset = start + lineStart,
+                    CloseWhenCaretAtBeginning = false
+                };
+                IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
+                data.Add(new MugenCompletionItem("Statedef ", mode, "Defines a new state."));
+                data.Add(new MugenCompletionItem("State ", mode, "Defines a new state controller."));
+                completionWindow.Show();
+                completionWindow.Closed += delegate
+                {
+                    completionWindow = null;
+                };
+            }
+            else if (mode == MugenCompletionItem.CompletionMode.PROPERTY_LHS)
+            {
+                // for a LHS property, we need to identify the current section.
+                // if the section is a Statedef, we show Statedef props.
+                // if the section is a State, we add the State props, and also any Controller props
+                // if we identify a Controller type.
+                string section = this.FindSectionForPos(lineStart);
+                switch (section.ToLower())
+                {
+                    case "statedef":
+                        // show only statedef-relevant props
+                        List<ValidProperty> defProps = Globals.validator.GetStatedefProperties();
+                        completionWindow = new CompletionWindow(editor.TextArea)
+                        {
+                            StartOffset = start + lineStart,
+                            CloseWhenCaretAtBeginning = false
+                        };
+                        // build list of properties
+                        IList<ICompletionData> dataDef = completionWindow.CompletionList.CompletionData;
+                        foreach (ValidProperty prop in defProps)
+                        {
+                            dataDef.Add(new MugenCompletionItem(prop.Name, mode, prop.GetPropertyDesc()));
+                        }
+                        completionWindow.Show();
+                        completionWindow.Closed += delegate
+                        {
+                            completionWindow = null;
+                        };
+                        break;
+                    case "state":
+                        // show only state-relevant props
+                        List<ValidProperty> stateProps = Globals.validator.GetStateProperties();
+                        // fetch sctrl-relevant props if type can be identified, otherwise this will be empty
+                        List<ValidProperty> sctrlProps = Globals.validator.GetControllerProperties(this.FindSctrlForPos(lineStart).ToLower());
+                        // remove `type` from state props if we found an sctrl (i.e. is already defined)
+                        if (sctrlProps.Count > 0)
+                        {
+                            stateProps.Remove(stateProps.Find(x => x.Name.Equals("type")));
+                        }
+                        completionWindow = new CompletionWindow(editor.TextArea)
+                        {
+                            StartOffset = start + lineStart,
+                            CloseWhenCaretAtBeginning = false
+                        };
+                        // build list of properties
+                        IList<ICompletionData> dataState = completionWindow.CompletionList.CompletionData;
+                        foreach (ValidProperty prop in stateProps)
+                        {
+                            dataState.Add(new MugenCompletionItem(prop.Name, mode, prop.GetPropertyDesc()));
+                        }
+                        foreach (ValidProperty prop in sctrlProps)
+                        {
+                            // todo, add sctrl descs when available
+                            dataState.Add(new MugenCompletionItem(prop.Name, mode, prop.GetPropertyDesc()));
+                        }
+                        completionWindow.Show();
+                        completionWindow.Closed += delegate
+                        {
+                            completionWindow = null;
+                        };
+                        break;
+                }
+            }
+            else if (mode == MugenCompletionItem.CompletionMode.PROPERTY_RHS)
+            {
+                // need to get the LHS in order to determine the property we are filling 
+                // split on equals for trigger lines
+                string propName = currLine.Substring(tmprhs, tmpeq).Split('=')[0].Trim();
+                string section = this.FindSectionForPos(lineStart);
+                List<ValidProperty> defProps = new List<ValidProperty>();
+                switch (section.ToLower())
+                {
+                    case "statedef":
+                        defProps = Globals.validator.GetStatedefProperties();
+                        break;
+                    case "state":
+                        defProps = Globals.validator.GetStateProperties();
+                        defProps = defProps.Concat(Globals.validator.GetControllerProperties(this.FindSctrlForPos(lineStart).ToLower())).ToList();
+                        break;
+                }
+                if(defProps.Any(x => x.Name.ToLower().Equals(propName)))
+                {
+                    ValidProperty finProp = defProps.First(x => x.Name.ToLower().Equals(propName));
+                    // check for enum in first value
+                    if(finProp.Types.First() == ValidProperty.PropType.Enum || finProp.Types.First() == ValidProperty.PropType.MultiEnum)
+                    {
+                        // populate with enum values
+                        completionWindow = new CompletionWindow(editor.TextArea)
+                        {
+                            StartOffset = editor.CaretOffset,
+                            CloseWhenCaretAtBeginning = false
+                        };
+                        // build list of properties
+                        IList<ICompletionData> dataState = completionWindow.CompletionList.CompletionData;
+                        foreach (string eval in finProp.EnumOpts)
+                        {
+                            // todo, add descs when available?
+                            dataState.Add(new MugenCompletionItem(eval, finProp.Types.First() == ValidProperty.PropType.MultiEnum ? MugenCompletionItem.CompletionMode.PROPERTY_RHS_MULTIENUM : MugenCompletionItem.CompletionMode.PROPERTY_RHS, ""));
+                        }
+                        completionWindow.Show();
+                        completionWindow.Closed += delegate
+                        {
+                            completionWindow = null;
+                        };
+                    }
+                }
+            }
+        }
+
+        // finds the section name for a given position in the editor
+        private string FindSectionForPos(int lineStart)
+        {
+            // get the relevant text
+            TabItem currentTab = editorTabs.Items[editorTabs.SelectedIndex] as TabItem;
+            TextEditor editor = currentTab.Content as TextEditor;
+            string prevText = editor.Text.Substring(0, lineStart);
+            // work backwards
+            char[] allChar = prevText.ToCharArray();
+            int end = allChar.Length - 1;
+            string sect = "";
+            bool sectOpen = false;
+            for (; end >= 0; end--)
+            {
+                char curr = allChar[end];
+                if (curr == ']' && sect.Equals(""))
+                {
+                    // section closer, start building section name
+                    sectOpen = true;
+                }
+                else if (curr == '[' && sectOpen)
+                {
+                    // section opener, stop building section name
+                    sectOpen = false;
+                }
+                else if (curr == ';')
+                {
+                    // comment, abort build
+                    sectOpen = false;
+                    sect = "";
+                }
+                else if (curr == '\n' && !sect.Equals(""))
+                {
+                    // section found, break
+                    break;
+                } else if (sectOpen)
+                {
+                    sect = curr + sect;
+                }
+            }
+            if (!sectOpen && !sect.Equals(""))
+            {
+                // if a section name was found AND the section header was closed properly
+                // return the first word in the header.
+                return sect.Split(' ')[0];
+            }
+            return "";
+        }
+
+        private string FindSctrlForPos(int lineStart)
+        {
+            // get the relevant text
+            TabItem currentTab = editorTabs.Items[editorTabs.SelectedIndex] as TabItem;
+            TextEditor editor = currentTab.Content as TextEditor;
+            string prevText = editor.Text.Substring(0, lineStart);
+            // work backwards
+            char[] allChar = prevText.ToCharArray();
+            int end = allChar.Length - 1;
+            // similar code to finding section since we care about finding `type =` before the section header.
+            string sect = "";
+            bool sectOpen = false;
+            // used to build the type
+            string type = "";
+            bool typeOpen = false;
+            for (; end >= 0; end--)
+            {
+                char curr = allChar[end];
+                if (curr == ']' && sect.Equals(""))
+                {
+                    // section closer, start building section name
+                    sectOpen = true;
+                }
+                else if (curr == '[' && sectOpen)
+                {
+                    // section opener, stop building section name
+                    sectOpen = false;
+                }
+                else if (curr == ';')
+                {
+                    // comment, abort build
+                    sectOpen = false;
+                    sect = "";
+                }
+                else if (curr == '\n' && !sect.Equals(""))
+                {
+                    // section found, break
+                    break;
+                }
+                else if (curr == '\n' && !type.Trim().ToLower().StartsWith("type") && !type.Equals(""))
+                {
+                    // failed to match type
+                    typeOpen = false;
+                    type = "";
+                }
+                else if (curr == '\n' && type.Trim().ToLower().StartsWith("type"))
+                {
+                    // type found, break
+                    break;
+                }
+                else if (curr == '\r' && type.Equals(""))
+                {
+                    // newline, start building type string
+                    typeOpen = true;
+                }
+
+                if (sectOpen && curr != ']')
+                {
+                    sect = curr + sect;
+                }
+                if (typeOpen && curr != '\n' && curr != '\r')
+                {
+                    type = curr + type;
+                }
+            }
+            if (!type.Equals("") && type.Trim().ToLower().StartsWith("type"))
+            {
+                return type.Split('=')[1].Trim();
+            }
+            return "";
         }
 
         // handle keyboard input (for shortcuts)
@@ -230,11 +569,15 @@ namespace MUGENStudio.Graphic
             if (editorTabs.Items.Count > 0) ((TabItem)editorTabs.Items.GetItemAt(0)).Focus();
         }
 
+        // globally-active key shortcuts go here
         private void GlobalKeyEvent(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.T && Keyboard.IsKeyDown(Key.LeftShift) && Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 this.ReopenLastClosedTab();
+            } else if (e.Key == Key.J && Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                // jump to statedef -- will open or focus the correct tab -- todo
             }
         }
     }

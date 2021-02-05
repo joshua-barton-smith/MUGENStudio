@@ -18,6 +18,10 @@ namespace MUGENStudio.Core
         /// list of previously opened projects
         /// </summary>
         public List<(string, string)> PreviousProjects { get; }
+        /// <summary>
+        /// is code completion enabled?
+        /// </summary>
+        public bool EnableCodeCompletion { get; }
 
         // internal xml document representation
         private XDocument settingsDoc;
@@ -50,6 +54,12 @@ namespace MUGENStudio.Core
                 // only read project elements
                 if (item.Name.LocalName.Equals("project")) this.PreviousProjects.Add((item.Attribute("defFile").Value, item.Attribute("charName").Value));
             }
+
+            // load the code completion flag
+            if (this.settingsDoc.Element("mugenSettings").Element("codeCompletion") != null)
+                this.EnableCodeCompletion = Boolean.Parse(this.settingsDoc.Element("mugenSettings").Element("codeCompletion").Attribute("value").Value);
+            else
+                this.EnableCodeCompletion = true;
         }
 
         /// <summary>
@@ -96,6 +106,8 @@ namespace MUGENStudio.Core
                 );
             }
 
+            this.settingsDoc.Element("mugenSettings").Element("codeCompletion").Attribute("value").SetValue(EnableCodeCompletion);
+
             // save the document
             this.settingsDoc.Save(this.xmlFile);
         }
@@ -106,7 +118,10 @@ namespace MUGENStudio.Core
             return new XDocument(
                 new XDeclaration("1.0", Encoding.UTF8.HeaderName, String.Empty),
                 new XElement("mugenSettings",
-                    new XElement("previousProjects")
+                    new XElement("previousProjects"),
+                    new XElement("codeCompletion",
+                        new XAttribute("value", "true")
+                    )
                 )
             );
         }

@@ -1,5 +1,6 @@
 ﻿using MUGENStudio.Graphic;
 using MUGENStudio.MugenParser;
+using MUGENStudio.MugenParser.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,11 @@ namespace MUGENStudio.Core
         /// globally-visible editor window
         /// </summary>
         public static CodeEditorWindow editor;
+        /// <summary>
+        /// validator for statedef and state controllers
+        /// </summary>
+        public static StateValidator validator = new StateValidator();
+
+        public static bool IsMultiEnumInput = false;
     }
 }

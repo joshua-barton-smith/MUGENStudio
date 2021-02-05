@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<section name="statedef" type="int" comment="false">
+	<property name="type" type="enum" optional="true">
+		<value val="S"/>
+		<value val="C"/>
+		<value val="A"/>
+	</property>
+	<property name="movetype" type="enum" optional="true">
+		<value val="A"/>
+		<value val="I"/>
+		<value val="H"/>
+		<value val="U"/>
+	</property>
+	<property name="physics" type="enum" optional="true">
+		<value val="S"/>
+		<value val="C"/>
+		<value val="A"/>
+		<value val="N"/>
+		<value val="U"/>
+	</property>
+	<property name="anim" type="int" optional="true"/>
+	<property name="velset" type="float" optional="true"/>
+	<property name="ctrl" type="bool" optional="true"/>
+	<property name="poweradd" type="int" optional="true"/>
+	<property name="juggle" type="int" optional="true"/>
+	<property name="facep2" type="bool" optional="true"/>
+	<property name="hitdefpersist" type="bool" optional="true"/>
+	<property name="movehitpersist" type="bool" optional="true"/>
+	<property name="hitcountpersist" type="bool" optional="true"/>
+	<property name="sprpriority" type="int" optional="true"/>
+</section>

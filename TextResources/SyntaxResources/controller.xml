@@ -1,0 +1,763 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<controllers>
+	<!-- should support defaults for params at some point -->
+	<controller name="AfterImage">
+		<property name="time" type="int" optional="true"/>
+		<property name="length" type="int" optional="true"/>
+		<property name="palcolor" type="int" optional="true"/>
+		<property name="palinvertall" type="bool" optional="true"/>
+		<property name="palbright" type="int triple" optional="true"/>
+		<property name="palcontrast" type="int triple" optional="true"/>
+		<property name="palpostbright" type="int triple" optional="true"/>
+		<property name="paladd" type="int triple" optional="true"/>
+		<property name="palmul" type="int triple" optional="true"/>
+		<property name="timegap" type="int" optional="true"/>
+		<property name="framegap" type="int" optional="true"/>
+		<property name="trans" type="enum" optional="true">
+			<value val="none"/>
+			<value val="add"/>
+			<value val="add1"/>
+			<value val="sub"/>
+		</property>
+	</controller>
+	<controller name="AfterImageTime">
+		<property name="time" type="int" optional="false" alternate="value"/>
+	</controller>
+	<controller name="AllPalFX">
+		<property name="time" type="int" optional="true"/>
+		<property name="add" type="int triple" optional="true"/>
+		<property name="mul" type="int triple" optional="true"/>
+		<property name="sinadd" type="int triple" optional="true"/>
+		<property name="invertall" type="bool" optional="true"/>
+		<property name="color" type="int" optional="true"/>
+	</controller>
+	<controller name="AngleAdd">
+		<property name="value" type="float" optional="false"/>
+	</controller>
+	<controller name="AngleDraw">
+		<property name="value" type="float" optional="true"/>
+		<property name="scale" type="float tuple" optional="true"/>
+	</controller>
+	<controller name="AngleMul">
+		<property name="value" type="float" optional="false"/>
+	</controller>
+	<controller name="AngleSet">
+		<property name="value" type="float" optional="false"/>
+	</controller>
+	<controller name="AppendToClipboard">
+		<property name="text" type="string" optional="false"/>
+		<property name="params" type="string" optional="true"/>
+		<!-- need to match param count to text param num, maybe not expressible here -->
+	</controller>
+	<controller name="AssertSpecial">
+		<property name="flag" type="enum" optional="false">
+			<value val="intro"/>
+			<value val="invisible"/>
+			<value val="roundnotover"/>
+			<value val="nobardisplay"/>
+			<value val="nobg"/>
+			<value val="nofg"/>
+			<value val="nostandguard"/>
+			<value val="nocrouchguard"/>
+			<value val="noairguard"/>
+			<value val="noautoturn"/>
+			<value val="nojugglecheck"/>
+			<value val="nokosnd"/>
+			<value val="nokoslow"/>
+			<value val="noshadow"/>
+			<value val="globalnoshadow"/>
+			<value val="nomusic"/>
+			<value val="nowalk"/>
+			<value val="timerfreeze"/>
+			<value val="unguardable"/>
+			<value val="noko"/>
+		</property>
+		<property name="flag2" type="enum" optional="true">
+			<value val="intro"/>
+			<value val="invisible"/>
+			<value val="roundnotover"/>
+			<value val="nobardisplay"/>
+			<value val="nobg"/>
+			<value val="nofg"/>
+			<value val="nostandguard"/>
+			<value val="nocrouchguard"/>
+			<value val="noairguard"/>
+			<value val="noautoturn"/>
+			<value val="nojugglecheck"/>
+			<value val="nokosnd"/>
+			<value val="nokoslow"/>
+			<value val="noshadow"/>
+			<value val="globalnoshadow"/>
+			<value val="nomusic"/>
+			<value val="nowalk"/>
+			<value val="timerfreeze"/>
+			<value val="unguardable"/>
+			<value val="noko"/>
+		</property>
+		<property name="flag3" type="enum" optional="true">
+			<value val="intro"/>
+			<value val="invisible"/>
+			<value val="roundnotover"/>
+			<value val="nobardisplay"/>
+			<value val="nobg"/>
+			<value val="nofg"/>
+			<value val="nostandguard"/>
+			<value val="nocrouchguard"/>
+			<value val="noairguard"/>
+			<value val="noautoturn"/>
+			<value val="nojugglecheck"/>
+			<value val="nokosnd"/>
+			<value val="nokoslow"/>
+			<value val="noshadow"/>
+			<value val="globalnoshadow"/>
+			<value val="nomusic"/>
+			<value val="nowalk"/>
+			<value val="timerfreeze"/>
+			<value val="unguardable"/>
+			<value val="noko"/>
+		</property>
+	</controller>
+	<controller name="AttackDist">
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="AttackMulSet">
+		<property name="value" type="float" optional="false"/>
+	</controller>
+	<controller name="BGPalFX">
+		<property name="time" type="int" optional="true"/>
+		<property name="add" type="int triple" optional="true"/>
+		<property name="mul" type="int triple" optional="true"/>
+		<property name="sinadd" type="int triple" optional="true"/>
+		<property name="invertall" type="bool" optional="true"/>
+		<property name="color" type="int" optional="true"/>
+	</controller>
+	<controller name="BindToParent">
+		<property name="time" type="int" optional="true"/>
+		<property name="facing" type="int" optional="true"/>
+		<property name="pos" type="float tuple" optional="true"/>
+	</controller>
+	<controller name="BindToRoot">
+		<property name="time" type="int" optional="true"/>
+		<property name="facing" type="int" optional="true"/>
+		<property name="pos" type="float tuple" optional="true"/>
+	</controller>
+	<controller name="BindToTarget">
+		<property name="time" type="int" optional="true"/>
+		<property name="ID" type="int" optional="true"/>
+		<property name="pos" type="float tuple" optional="true"/>
+	</controller>
+	<controller name="ChangeAnim">
+		<property name="value" type="int" optional="false"/>
+		<property name="elem" type="int" optional="true"/>
+	</controller>
+	<controller name="ChangeAnim2">
+		<property name="value" type="int" optional="false"/>
+		<property name="elem" type="int" optional="true"/>
+	</controller>
+	<controller name="ChangeState">
+		<property name="value" type="int" optional="false"/>
+		<property name="ctrl" type="bool" optional="true"/>
+		<property name="anim" type="int" optional="true"/>
+	</controller>
+	<controller name="ClearClipboard"></controller>
+	<controller name="CtrlSet">
+		<property name="value" type="bool" optional="false"/>
+	</controller>
+	<controller name="DefenceMulSet">
+		<property name="value" type="float" optional="false"/>
+	</controller>
+	<controller name="DestroySelf">
+		<!-- 1.1-only params, not supporting version on params yet -->
+		<property name="recursive" type="bool" optional="true"/>
+		<property name="removeexplods" type="bool" optional="true"/>
+	</controller>
+	<controller name="DisplayToClipboard">
+		<property name="text" type="string" optional="false"/>
+		<property name="params" type="string" optional="true"/>
+		<!-- need to match param count to text param num, maybe not expressible here -->
+	</controller>
+	<controller name="EnvColor">
+		<property name="value" type="int triple" optional="true"/>
+		<property name="time" type="int" optional="true"/>
+		<property name="under" type="bool" optional="true"/>
+	</controller>
+	<controller name="EnvShake">
+		<property name="value" type="int" optional="false"/>
+		<property name="freq" type="float" optional="true"/>
+		<property name="ampl" type="int" optional="true"/>
+		<property name="phase" type="float" optional="true"/>
+	</controller>
+	<controller name="Explod">
+		<property name="anim" type="int" optional="false"/>
+		<property name="ID" type="int" optional="true"/>
+		<property name="pos" type="int tuple" optional="true"/>
+		<property name="postype" type="enum" optional="true">
+			<value val="p1"/>
+			<value val="p2"/>
+			<value val="front"/>
+			<value val="back"/>
+			<value val="left"/>
+			<value val="right"/>
+		</property>
+		<property name="facing" type="int" optional="true"/>
+		<property name="vfacing" type="int" optional="true"/>
+		<property name="bindtime" type="int" optional="true"/>
+		<property name="vel" type="float tuple" optional="true"/>
+		<property name="accel" type="float tuple" optional="true"/>
+		<property name="random" type="int tuple" optional="true"/>
+		<property name="removetime" type="int" optional="true"/>
+		<property name="supermove" type="bool" optional="true"/>
+		<property name="supermovetime" type="int" optional="true"/>
+		<property name="pausemovetime" type="int" optional="true"/>
+		<property name="scale" type="float tuple" optional="true"/>
+		<property name="sprpriority" type="int" optional="true"/>
+		<property name="ontop" type="bool" optional="true"/>
+		<property name="shadow" type="int triple" optional="true"/>
+		<property name="ownpal" type="bool" optional="true"/>
+		<property name="removeongethit" type="bool" optional="true"/>
+		<property name="trans" type="enum" optional="true">
+			<value val="default"/>
+			<value val="none"/>
+			<value val="add"/>
+			<value val="addalpha"/>
+			<value val="add1"/>
+			<value val="sub"/>
+		</property>
+	</controller>
+	<controller name="ExplodBindTime">
+		<property name="ID" type="int" optional="true"/>
+		<property name="time" type="int" optional="true" alternate="value"/>
+	</controller>
+	<controller name="ForceFeedback">
+		<property name="waveform" type="enum" optional="true">
+			<value val="sine"/>
+			<value val="square"/>
+			<value val="sinesquare"/>
+			<value val="off"/>
+		</property>
+		<property name="time" type="int" optional="true"/>
+		<property name="freq" type="int float float float" optional="true"/>
+		<property name="ampl" type="int float float float" optional="true"/>
+		<property name="self" type="bool" optional="true"/>
+	</controller>
+	<controller name="FallEnvShake"></controller>
+	<controller name="GameMakeAnim">
+		<property name="value" type="int" optional="true"/>
+		<property name="under" type="bool" optional="true"/>
+		<property name="pos" type="float tuple" optional="true"/>
+		<property name="random" type="int" optional="true"/>
+	</controller>
+	<controller name="Gravity"></controller>
+	<controller name="Helper">
+		<property name="helpertype" type="enum" optional="true">
+			<value val="normal"/>
+			<value val="player"/>
+			<value val="projectile"/>
+		</property>
+		<property name="name" type="string" optional="true"/>
+		<property name="ID" type="int" optional="true"/>
+		<property name="pos" type="int tuple" optional="true"/>
+		<property name="postype" type="enum" optional="true">
+			<value val="p1"/>
+			<value val="p2"/>
+			<value val="front"/>
+			<value val="back"/>
+			<value val="left"/>
+			<value val="right"/>
+		</property>
+		<property name="facing" type="int" optional="true"/>
+		<property name="stateno" type="int" optional="true"/>
+		<property name="keyctrl" type="bool" optional="true"/>
+		<property name="ownpal" type="bool" optional="true"/>
+		<property name="supermovetime" type="int" optional="true"/>
+		<property name="pausemovetime" type="int" optional="true"/>
+		<property name="size.xscale" type="int" optional="true"/>
+		<property name="size.yscale" type="int" optional="true"/>
+		<property name="size.ground.back" type="int" optional="true"/>
+		<property name="size.ground.front" type="int" optional="true"/>
+		<property name="size.air.back" type="int" optional="true"/>
+		<property name="size.air.front" type="int" optional="true"/>
+		<property name="size.height" type="int" optional="true"/>
+		<property name="size.proj.doscale" type="int" optional="true"/>
+		<property name="size.head.pos" type="int" optional="true"/>
+		<property name="size.mid.pos" type="int" optional="true"/>
+		<property name="size.shadowoffset" type="int" optional="true"/>
+	</controller>
+	<controller name="HitAdd">
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="HitBy">
+		<!-- technically value2 is not alternate, todo -->
+		<property name="value" type="hitattr" optional="false" alternate="value2"/>
+		<property name="time" type="int" optional="true"/>
+	</controller>
+	<controller name="HitDef">
+		<property name="attr" type="hitattr" optional="false"/>
+		<property name="hitflag" type="multienum" optional="true">
+			<value val="H"/>
+			<value val="L"/>
+			<value val="A"/>
+			<value val="M"/>
+			<value val="D"/>
+			<value val="+"/>
+			<value val="-"/>
+		</property>
+		<property name="guardflag" type="multienum" optional="true">
+			<value val="H"/>
+			<value val="L"/>
+			<value val="A"/>
+			<value val="M"/>
+			<value val="D"/>
+		</property>
+		<property name="affectteam" type="enum" optional="true">
+			<value val="B"/>
+			<value val="F"/>
+			<value val="E"/>
+		</property>
+		<property name="animtype" type="enum" optional="true">
+			<value val="light"/>
+			<value val="hard"/>
+			<value val="medium"/>
+			<value val="back"/>
+			<value val="up"/>
+			<value val="diag"/>
+		</property>
+		<property name="air.animtype" type="enum" optional="true">
+			<value val="light"/>
+			<value val="hard"/>
+			<value val="medium"/>
+			<value val="back"/>
+			<value val="up"/>
+			<value val="diag"/>
+		</property>
+		<property name="fall.animtype" type="enum" optional="true">
+			<value val="light"/>
+			<value val="hard"/>
+			<value val="medium"/>
+			<value val="back"/>
+			<value val="up"/>
+			<value val="diag"/>
+		</property>
+		<property name="priority" type="int enum" optional="true">
+			<value val="Hit"/>
+			<value val="Miss"/>
+			<value val="Dodge"/>
+		</property>
+		<property name="damage" type="int tuple" optional="true"/>
+		<property name="pausetime" type="int tuple" optional="true"/>
+		<property name="guard.pausetime" type="int tuple" optional="true"/>
+		<property name="sparkno" type="int" optional="true"/>
+		<property name="guard.sparkno" type="int" optional="true"/>
+		<property name="sparkxy" type="int tuple" optional="true"/>
+		<property name="hitsound" type="int tuple" optional="true"/>
+		<property name="guardsound" type="int tuple" optional="true"/>
+		<property name="ground.type" type="enum" optional="true">
+			<value val="High"/>
+			<value val="Low"/>
+			<value val="Trip"/>
+			<value val="None"/>
+		</property>
+		<property name="air.type" type="enum" optional="true">
+			<value val="High"/>
+			<value val="Low"/>
+			<value val="Trip"/>
+			<value val="None"/>
+		</property>
+		<property name="ground.slidetime" type="int" optional="true"/>
+		<property name="guard.slidetime" type="int" optional="true"/>
+		<property name="ground.hittime" type="int" optional="true"/>
+		<property name="guard.hittime" type="int" optional="true"/>
+		<property name="air.hittime" type="int" optional="true"/>
+		<property name="guard.ctrltime" type="int" optional="true"/>
+		<property name="guard.dist" type="int" optional="true"/>
+		<property name="yaccel" type="float" optional="true"/>
+		<property name="ground.velocity" type="float tuple" optional="true"/>
+		<property name="guard.velocity" type="float" optional="true"/>
+		<property name="air.velocity" type="float tuple" optional="true"/>
+		<property name="airguard.velocity" type="float tuple" optional="true"/>
+		<property name="ground.cornerpush.veloff" type="float" optional="true"/>
+		<property name="air.cornerpush.veloff" type="float" optional="true"/>
+		<property name="down.cornerpush.veloff" type="float" optional="true"/>
+		<property name="guard.cornerpush.veloff" type="float" optional="true"/>
+		<property name="airguard.cornerpush.veloff" type="float" optional="true"/>
+		<property name="air.juggle" type="int" optional="true"/>
+		<property name="mindist" type="int tuple" optional="true"/>
+		<property name="maxdist" type="int tuple" optional="true"/>
+		<property name="snap" type="int tuple" optional="true"/>
+		<property name="p1sprpriority" type="int" optional="true"/>
+		<property name="p2sprpriority" type="int" optional="true"/>
+		<property name="p1facing" type="int" optional="true"/>
+		<property name="p1getp2facing" type="bool" optional="true"/>
+		<property name="p2facing" type="int" optional="true"/>
+		<property name="p1stateno" type="int" optional="true"/>
+		<property name="p2stateno" type="int" optional="true"/>
+		<property name="p2getp1state" type="bool" optional="true"/>
+		<property name="forcestand" type="bool" optional="true"/>
+		<property name="fall" type="bool" optional="true"/>
+		<property name="fall.xvelocity" type="float" optional="true"/>
+		<property name="fall.yvelocity" type="float" optional="true"/>
+		<property name="fall.recover" type="bool" optional="true"/>
+		<property name="fall.recovertime" type="int" optional="true"/>
+		<property name="fall.damage" type="int" optional="true"/>
+		<property name="air.fall" type="bool" optional="true"/>
+		<property name="forcenofall" type="bool" optional="true"/>
+		<property name="down.velocity" type="float tuple" optional="true"/>
+		<property name="down.hittime" type="int" optional="true"/>
+		<property name="down.bounce" type="bool" optional="true"/>
+		<property name="id" type="int" optional="true"/>
+		<property name="chainID" type="int" optional="true"/>
+		<property name="nochainID" type="int tuple" optional="true"/>
+		<property name="hitonce" type="bool" optional="true"/>
+		<property name="kill" type="bool" optional="true"/>
+		<property name="guard.kill" type="bool" optional="true"/>
+		<property name="fall.kill" type="bool" optional="true"/>
+		<property name="numhits" type="int" optional="true"/>
+		<property name="getpower" type="int tuple" optional="true"/>
+		<property name="givepower" type="int tuple" optional="true"/>
+		<property name="palfx.time" type="int" optional="true"/>
+		<property name="palfx.mul" type="int triple" optional="true"/>
+		<property name="palfx.add" type="int triple" optional="true"/>
+		<property name="envshake.time" type="int" optional="true"/>
+		<property name="envshake.freq" type="float" optional="true"/>
+		<property name="envshake.ampl" type="int" optional="true"/>
+		<property name="envshake.phase" type="float" optional="true"/>
+		<property name="fall.envshake.time" type="int" optional="true"/>
+		<property name="fall.envshake.freq" type="float" optional="true"/>
+		<property name="fall.envshake.ampl" type="int" optional="true"/>
+		<property name="fall.envshake.phase" type="float" optional="true"/>
+	</controller>
+	<controller name="HitFallDamage"></controller>
+	<controller name="HitFallSet">
+		<property name="value" type="int" optional="true"/>
+		<property name="xvel" type="float" optional="true"/>
+		<property name="yvel" type="float" optional="true"/>
+	</controller>
+	<controller name="HitFallVel"></controller>
+	<controller name="HitOverride">
+		<property name="attr" type="hitattr" optional="false"/>
+		<property name="stateno" type="int" optional="false"/>
+		<property name="slot" type="int" optional="true"/>
+		<property name="time" type="int" optional="true"/>
+		<property name="forceair" type="bool" optional="true"/>
+	</controller>
+	<controller name="HitVelSet">
+		<property name="x" type="int" optional="true"/>
+		<property name="y" type="int" optional="true"/>
+	</controller>
+	<controller name="LifeAdd">
+		<property name="value" type="int" optional="false"/>
+		<property name="kill" type="bool" optional="true"/>
+		<property name="absolute" type="bool" optional="true"/>
+	</controller>
+	<controller name="LifeSet">
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="MakeDust">
+		<property name="pos" type="int tuple" optional="true"/>
+		<property name="pos2" type="int tuple" optional="true"/>
+		<property name="spacing" type="int" optional="true"/>
+	</controller>
+	<controller name="ModifyExplod">
+		<property name="anim" type="int" optional="false"/>
+		<property name="ID" type="int" optional="true"/>
+		<property name="pos" type="int tuple" optional="true"/>
+		<property name="postype" type="enum" optional="true">
+			<value val="p1"/>
+			<value val="p2"/>
+			<value val="front"/>
+			<value val="back"/>
+			<value val="left"/>
+			<value val="right"/>
+		</property>
+		<property name="facing" type="int" optional="true"/>
+		<property name="vfacing" type="int" optional="true"/>
+		<property name="bindtime" type="int" optional="true"/>
+		<property name="vel" type="float tuple" optional="true"/>
+		<property name="accel" type="float tuple" optional="true"/>
+		<property name="random" type="int tuple" optional="true"/>
+		<property name="removetime" type="int" optional="true"/>
+		<property name="supermove" type="bool" optional="true"/>
+		<property name="supermovetime" type="int" optional="true"/>
+		<property name="pausemovetime" type="int" optional="true"/>
+		<property name="scale" type="float tuple" optional="true"/>
+		<property name="sprpriority" type="int" optional="true"/>
+		<property name="ontop" type="bool" optional="true"/>
+		<property name="shadow" type="int triple" optional="true"/>
+		<property name="ownpal" type="bool" optional="true"/>
+		<property name="removeongethit" type="bool" optional="true"/>
+		<property name="trans" type="enum" optional="true">
+			<value val="default"/>
+			<value val="none"/>
+			<value val="add"/>
+			<value val="addalpha"/>
+			<value val="add1"/>
+			<value val="sub"/>
+		</property>
+	</controller>
+	<controller name="MoveHitReset"></controller>
+	<controller name="NotHitBy">
+		<!-- technically value2 is not alternate, todo -->
+		<property name="value" type="hitattr" optional="false" alternate="value2"/>
+		<property name="time" type="int" optional="true"/>
+	</controller>
+	<controller name="Null"></controller>
+	<controller name="Offset">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+	</controller>
+	<controller name="PalFX">
+		<property name="time" type="int" optional="true"/>
+		<property name="add" type="int triple" optional="true"/>
+		<property name="mul" type="int triple" optional="true"/>
+		<property name="sinadd" type="int triple" optional="true"/>
+		<property name="invertall" type="bool" optional="true"/>
+		<property name="color" type="int" optional="true"/>
+	</controller>
+	<controller name="ParentVarAdd">
+		<!-- need to make `value` take either int or float. also need to support alt syntax -->
+		<property name="v" type="int" optional="false" alternate="fv"/>
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="ParentVarSet">
+		<!-- need to make `value` take either int or float. also need to support alt syntax -->
+		<property name="v" type="int" optional="false" alternate="fv"/>
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="Pause">
+		<property name="time" type="int" optional="false"/>
+		<property name="endcmdbuftime" type="int" optional="true"/>
+		<property name="movetime" type="int" optional="true"/>
+		<property name="pausebg" type="bool" optional="true"/>
+	</controller>
+	<controller name="PlayerPush">
+		<property name="value" type="bool" optional="false"/>
+	</controller>
+	<controller name="PlaySnd">
+		<property name="value" type="int tuple" optional="false"/>
+		<property name="volumescale" type="float" optional="true"/>
+		<property name="channel" type="int" optional="true"/>
+		<property name="lowpriority" type="int" optional="true"/>
+		<property name="freqmul" type="float" optional="true"/>
+		<property name="loop" type="bool" optional="true"/>
+		<property name="pan" type="int" optional="true"/>
+		<property name="abspan" type="int" optional="true"/>
+	</controller>
+	<controller name="PosAdd">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+	</controller>
+	<controller name="PosFreeze">
+		<property name="value" type="bool" optional="true"/>
+	</controller>
+	<controller name="PosSet">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+	</controller>
+	<controller name="PowerAdd">
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="PowerSet">
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="Projectile">
+		<property name="projID" type="int" optional="true"/>
+		<property name="projanim" type="int" optional="true"/>
+		<property name="projhitanim" type="int" optional="true"/>
+		<property name="projremanim" type="int" optional="true"/>
+		<property name="projcancelanim" type="int" optional="true"/>
+		<property name="projscale" type="float tuple" optional="true"/>
+		<property name="projremove" type="bool" optional="true"/>
+		<property name="projremovetime" type="int" optional="true"/>
+		<property name="velocity" type="float tuple" optional="true"/>
+		<property name="remvelocity" type="float tuple" optional="true"/>
+		<property name="accel" type="float tuple" optional="true"/>
+		<property name="velmul" type="float tuple" optional="true"/>
+		<property name="projhits" type="int" optional="true"/>
+		<property name="projmisstime" type="int" optional="true"/>
+		<property name="projpriority" type="int" optional="true"/>
+		<property name="projsprpriority" type="int" optional="true"/>
+		<property name="projedgebound" type="int" optional="true"/>
+		<property name="projstagebound" type="int" optional="true"/>
+		<property name="projheightbound" type="int tuple" optional="true"/>
+		<property name="offset" type="int tuple" optional="true"/>
+		<property name="postype" type="enum" optional="true">
+			<value val="p1"/>
+			<value val="p2"/>
+			<value val="front"/>
+			<value val="back"/>
+			<value val="left"/>
+			<value val="right"/>
+		</property>
+		<property name="projshadow" type="int triple" optional="true"/>
+		<property name="supermovetime" type="int" optional="true"/>
+		<property name="pausemovetime" type="int" optional="true"/>
+		<property name="afterimage.time" type="int" optional="true"/>
+		<property name="afterimage.length" type="int" optional="true"/>
+		<property name="afterimage.palcolor" type="int" optional="true"/>
+		<property name="afterimage.palinvertall" type="bool" optional="true"/>
+		<property name="afterimage.palbright" type="int triple" optional="true"/>
+		<property name="afterimage.palcontrast" type="int triple" optional="true"/>
+		<property name="afterimage.palpostbright" type="int triple" optional="true"/>
+		<property name="afterimage.paladd" type="int triple" optional="true"/>
+		<property name="afterimage.palmul" type="int triple" optional="true"/>
+		<property name="afterimage.timegap" type="int" optional="true"/>
+		<property name="afterimage.framegap" type="int" optional="true"/>
+		<property name="afterimage.trans" type="enum" optional="true">
+			<value val="none"/>
+			<value val="add"/>
+			<value val="add1"/>
+			<value val="sub"/>
+		</property>
+	</controller>
+	<controller name="RemapPal">
+		<property name="source" type="int tuple" optional="false"/>
+		<property name="dest" type="int tuple" optional="false"/>
+	</controller>
+	<controller name="RemoveExplod">
+		<property name="ID" type="int" optional="true"/>
+	</controller>
+	<controller name="ReversalDef">
+		<!-- todo, think reversal takes many more hitdef propertys -->
+		<property name="reversal.attr" type="hitattr" optional="false"/>
+		<property name="pausetime" type="int tuple" optional="true"/>
+		<property name="sparkno" type="int tuple" optional="true"/>
+		<property name="hitsound" type="int tuple" optional="true"/>
+		<property name="p1stateno" type="int" optional="true"/>
+		<property name="p2stateno" type="int" optional="true"/>
+		<property name="p2getp1state" type="bool" optional="true"/>
+	</controller>
+	<controller name="ScreenBound">
+		<property name="value" type="bool" optional="true"/>
+		<property name="movecamera" type="bool tuple" optional="true"/>
+	</controller>
+	<controller name="SelfState">
+		<property name="value" type="int" optional="false"/>
+		<property name="ctrl" type="bool" optional="true"/>
+		<property name="anim" type="int" optional="true"/>
+	</controller>
+	<controller name="SprPriority">
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="StateTypeSet">
+		<property name="statetype" type="enum" optional="true">
+			<value val="S"/>
+			<value val="C"/>
+			<value val="A"/>
+		</property>
+		<property name="movetype" type="enum" optional="true">
+			<value val="A"/>
+			<value val="I"/>
+			<value val="H"/>
+		</property>
+		<property name="physics" type="enum" optional="true">
+			<value val="S"/>
+			<value val="C"/>
+			<value val="A"/>
+			<value val="N"/>
+		</property>
+	</controller>
+	<controller name="SndPan">
+		<property name="channel" type="int" optional="false"/>
+		<property name="pan" type="int" optional="false" alternate="abspan"/>
+	</controller>
+	<controller name="StopSnd">
+		<property name="channel" type="int" optional="false"/>
+	</controller>
+	<controller name="SuperPause">
+		<property name="time" type="int" optional="true"/>
+		<property name="anim" type="int" optional="true"/>
+		<property name="sound" type="int tuple" optional="true"/>
+		<property name="pos" type="float tuple" optional="true"/>
+		<property name="darken" type="bool" optional="true"/>
+		<property name="p2defmul" type="float" optional="true"/>
+		<property name="poweradd" type="int" optional="true"/>
+		<property name="unhittable" type="bool" optional="true"/>
+	</controller>
+	<controller name="TargetBind">
+		<property name="time" type="int" optional="true"/>
+		<property name="ID" type="int" optional="true"/>
+		<property name="pos" type="float tuple" optional="true"/>
+	</controller>
+	<controller name="TargetDrop">
+		<property name="excludeID" type="int" optional="true"/>
+		<property name="keepone" type="bool" optional="true"/>
+	</controller>
+	<controller name="TargetFacing">
+		<property name="value" type="int" optional="false"/>
+		<property name="ID" type="int" optional="true"/>
+	</controller>
+	<controller name="TargetLifeAdd">
+		<property name="value" type="int" optional="false"/>
+		<property name="ID" type="int" optional="true"/>
+		<property name="kill" type="bool" optional="true"/>
+		<property name="absolute" type="bool" optional="true"/>
+	</controller>
+	<controller name="TargetPowerAdd">
+		<property name="value" type="int" optional="false"/>
+		<property name="ID" type="int" optional="true"/>
+	</controller>
+	<controller name="TargetState">
+		<property name="value" type="int" optional="false"/>
+		<property name="ID" type="int" optional="true"/>
+	</controller>
+	<controller name="TargetVelAdd">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+		<property name="ID" type="int" optional="true"/>
+	</controller>
+	<controller name="TargetVelSet">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+		<property name="ID" type="int" optional="true"/>
+	</controller>
+	<controller name="Trans">
+		<property name="trans" type="enum" optional="false">
+			<value val="default"/>
+			<value val="none"/>
+			<value val="add"/>
+			<value val="addalpha"/>
+			<value val="add1"/>
+			<value val="sub"/>
+		</property>
+	</controller>
+	<controller name="Turn"></controller>
+	<controller name="VarAdd">
+		<!-- need to make `value` take either int or float. also need to support alt syntax -->
+		<property name="v" type="int" optional="false" alternate="fv"/>
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="VarRandom">
+		<property name="v" type="int" optional="false" alternate="fv"/>
+		<property name="range" type="int tuple" optional="true"/>
+	</controller>
+	<controller name="VarRangeSet">
+		<!-- need to make `value` take either int or float. -->
+		<property name="value" type="int" optional="false" alternate="fvalue"/>
+		<property name="first" type="int" optional="true"/>
+		<property name="last" type="int" optional="true"/>
+	</controller>
+	<controller name="VarSet">
+		<!-- need to make `value` take either int or float. also need to support alt syntax -->
+		<property name="v" type="int" optional="false" alternate="fv"/>
+		<property name="value" type="int" optional="false"/>
+	</controller>
+	<controller name="VelAdd">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+	</controller>
+	<controller name="VelMul">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+	</controller>
+	<controller name="VelSet">
+		<property name="x" type="float" optional="true"/>
+		<property name="y" type="float" optional="true"/>
+	</controller>
+	<controller name="VictoryQuote">
+		<property name="value" type="int" optional="true"/>
+	</controller>
+	<controller name="Width">
+		<property name="edge" type="int tuple" optional="true" alternate="value"/>
+		<property name="player" type="int tuple" optional="true"/>
+	</controller>
+</controllers>

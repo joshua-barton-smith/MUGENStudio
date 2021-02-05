@@ -80,6 +80,7 @@
     <Compile Include="Graphic\CodeEditorWindow.xaml.cs">
       <DependentUpon>CodeEditorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Graphic\MugenCompletionItem.cs" />
     <Compile Include="Graphic\MugenTreeViewItem.cs" />
     <Compile Include="Graphic\SelectProjectWindow.xaml.cs">
       <DependentUpon>SelectProjectWindow.xaml</DependentUpon>
@@ -93,6 +94,10 @@
     <Compile Include="MugenParser\MugenINI.cs" />
     <Compile Include="MugenParser\MugenST.cs" />
     <Compile Include="MugenParser\SimpleINI.cs" />
+    <Compile Include="MugenParser\Validation\StateValidator.cs" />
+    <Compile Include="MugenParser\Validation\ValidController.cs" />
+    <Compile Include="MugenParser\Validation\ValidProperty.cs" />
+    <Compile Include="MugenParser\Validation\ValidSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -130,6 +135,21 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TextResources\CommonFiles\WinCommon.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TextResources\SyntaxResources\statedef.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TextResources\SyntaxResources\controller.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TextResources\SyntaxResources\state.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
