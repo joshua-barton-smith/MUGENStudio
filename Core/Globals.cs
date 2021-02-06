@@ -30,7 +30,5 @@ namespace MUGENStudio.Core
         /// validator for statedef and state controllers
         /// </summary>
         public static StateValidator validator = new StateValidator();
-
-        public static bool IsMultiEnumInput = false;
     }
 }

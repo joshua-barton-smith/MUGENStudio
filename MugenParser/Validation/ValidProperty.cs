@@ -43,6 +43,10 @@ namespace MUGENStudio.MugenParser.Validation
             this.EnumOpts = opts;
         }
 
+        /// <summary>
+        /// gets the description for a property for tooltip rendering.
+        /// </summary>
+        /// <returns></returns>
         public string GetPropertyDesc()
         {
             string pt = "";

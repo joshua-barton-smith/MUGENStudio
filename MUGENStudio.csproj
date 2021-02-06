@@ -81,6 +81,7 @@
       <DependentUpon>CodeEditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Graphic\MugenCompletionItem.cs" />
+    <Compile Include="Graphic\MugenSaveableEditor.cs" />
     <Compile Include="Graphic\MugenTreeViewItem.cs" />
     <Compile Include="Graphic\SelectProjectWindow.xaml.cs">
       <DependentUpon>SelectProjectWindow.xaml</DependentUpon>
@@ -92,8 +93,12 @@
     <Compile Include="MugenParser\MugenCNS.cs" />
     <Compile Include="MugenParser\MugenDefinition.cs" />
     <Compile Include="MugenParser\MugenINI.cs" />
+    <Compile Include="MugenParser\MugenSFF.cs" />
     <Compile Include="MugenParser\MugenST.cs" />
     <Compile Include="MugenParser\SimpleINI.cs" />
+    <Compile Include="MugenParser\Sprites\SFF1File.cs" />
+    <Compile Include="MugenParser\Sprites\SFF2File.cs" />
+    <Compile Include="MugenParser\Sprites\SpriteFile.cs" />
     <Compile Include="MugenParser\Validation\StateValidator.cs" />
     <Compile Include="MugenParser\Validation\ValidController.cs" />
     <Compile Include="MugenParser\Validation\ValidProperty.cs" />

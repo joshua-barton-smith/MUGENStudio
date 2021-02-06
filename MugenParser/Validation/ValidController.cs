@@ -12,7 +12,7 @@ namespace MUGENStudio.MugenParser.Validation
         /// name for the controller
         /// </summary>
         public string Name { get; }
-        private List<ValidProperty> properties;
+        private readonly List<ValidProperty> properties;
 
         public ValidController(string name)
         {

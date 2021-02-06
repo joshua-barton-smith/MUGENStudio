@@ -159,9 +159,10 @@ namespace MUGENStudio.Graphic
                     if (Globals.settingsSingleton.EnableCodeCompletion) editor.TextArea.TextEntering += HandleEditorAutoCompletionSubmit;
 
                     // insert the tab with the editor as its contents
-                    TabItem newItem = new TabItem()
+                    MugenSaveableEditor newItem = new MugenSaveableEditor()
                     {
                         Header = item.BackingFile.FileKey,
+                        BackingFile = item.BackingFile,
                         ContextMenu = tabContext,
                         Content = editor
                     };
@@ -191,7 +192,6 @@ namespace MUGENStudio.Graphic
         private void HandleEditorAutoCompletion(object sender, TextCompositionEventArgs e)
         {
             if (completionWindow != null) return;
-            Globals.IsMultiEnumInput = false;
             // fetch the input so far
             string input = e.Text;
             // fetch the tab text up to cursor position
@@ -506,10 +506,20 @@ namespace MUGENStudio.Graphic
         // handle keyboard input (for shortcuts)
         private void TabHandleKeys(object sender, KeyEventArgs e)
         {
-            TabItem tab = sender as TabItem;
+            MugenSaveableEditor tab = sender as MugenSaveableEditor;
             if (e.Key == Key.W && Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 this.CloseTabSafely(tab);
+            } 
+            else if (e.Key == Key.S && Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                tab.SaveIfModified();
+            }
+            else if(Keyboard.Modifiers == ModifierKeys.None || e.Key == Key.Back)
+            {
+                // update saveable state
+                tab.IsDirty = true;
+                tab.UpdateTitle();
             }
         }
 

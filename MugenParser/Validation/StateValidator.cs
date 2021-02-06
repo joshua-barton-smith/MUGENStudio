@@ -206,16 +206,28 @@ namespace MUGENStudio.MugenParser.Validation
             }
         }
 
+        /// <summary>
+        /// gets a full list of valid statedef properties.
+        /// </summary>
+        /// <returns></returns>
         public List<ValidProperty> GetStatedefProperties()
         {
             return this.statedef.GetProperties();
         }
 
+        /// <summary>
+        /// gets a full list of valid state properties.
+        /// </summary>
+        /// <returns></returns>
         public List<ValidProperty> GetStateProperties()
         {
             return this.state.GetProperties();
         }
 
+        /// <summary>
+        /// gets a full list of valid controller properties.
+        /// </summary>
+        /// <returns></returns>
         public List<ValidProperty> GetControllerProperties(string sctrl)
         {
             if (!controllers.Any(x => x.Key.ToLower().Equals(sctrl))) return new List<ValidProperty>();

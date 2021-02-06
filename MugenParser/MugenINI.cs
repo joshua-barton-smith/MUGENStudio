@@ -17,6 +17,8 @@ namespace MUGENStudio.MugenParser
         /// backing INI handler for this file
         /// </summary>
         protected SimpleINI backing;
+        // original encoding of the file
+        private Encoding encoding;
 
         /// <summary>
         /// filename used in the DEF
@@ -40,6 +42,7 @@ namespace MUGENStudio.MugenParser
             this.backing = new SimpleINI(path, shouldCreate);
             this.FileKey = fileKey;
             this.FilePath = path;
+            this.encoding = Util.GetEncoding(this.FilePath);
         }
 
         /// <summary>
@@ -59,7 +62,12 @@ namespace MUGENStudio.MugenParser
         // gets the raw file contents
         internal string GetFileRawContents()
         {
-            return File.ReadAllText(this.FilePath, Util.GetEncoding(this.FilePath));
+            return File.ReadAllText(this.FilePath, this.encoding);
+        }
+
+        internal void WriteFileContents(string content)
+        {
+            File.WriteAllText(this.FilePath, content, this.encoding);
         }
     }
 }

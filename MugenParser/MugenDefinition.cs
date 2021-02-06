@@ -48,6 +48,10 @@ namespace MUGENStudio.MugenParser
         /// </summary>
         public MugenST CommonFile { get; }
         /// <summary>
+        /// Sprite file of character
+        /// </summary>
+        public MugenSFF SpriteFile { get; }
+        /// <summary>
         /// Set of statefiles for the character, along with their numbering in the DEF
         /// </summary>
         public Dictionary<string, MugenST> StateFiles { get; }
@@ -119,6 +123,8 @@ namespace MUGENStudio.MugenParser
                 }
             }
 
+            // read SFF file data
+            this.SpriteFile = new MugenSFF(this.RelativePathToDef(path, this.GetValueWithFallback("Files", "sprite", "blank.sff")), this.GetValueWithFallback("Files", "sprite", "blank.sff"));
             // 3. Arcade section -- TODO
 
             // validates the project, checks syntax errors, etc

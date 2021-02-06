@@ -12,7 +12,7 @@ namespace MUGENStudio.MugenParser.Validation
     public class ValidSection
     {
         // list of properties valid for this section
-        private List<ValidProperty> properties;
+        private readonly List<ValidProperty> properties;
         /// <summary>
         /// constructs a new valid INI section
         /// </summary>
