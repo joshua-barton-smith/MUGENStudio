@@ -168,7 +168,8 @@ namespace MUGENStudio.Graphic
                         Content = editor
                     };
                     // add keyboard handler for shortcuts
-                    newItem.AddHandler(KeyUpEvent, new KeyEventHandler(TabHandleKeys));
+                    newItem.AddHandler(KeyDownEvent, new KeyEventHandler(TabHandleKeysDown));
+                    newItem.AddHandler(KeyUpEvent, new KeyEventHandler(TabHandleKeysUp));
                     editorTabs.Items.Add(newItem);
                     newItem.Focus();
                 }
@@ -510,18 +511,30 @@ namespace MUGENStudio.Graphic
         }
 
         // handle keyboard input (for shortcuts)
-        private void TabHandleKeys(object sender, KeyEventArgs e)
+        private void TabHandleKeysDown(object sender, KeyEventArgs e)
         {
             MugenSaveableEditor tab = sender as MugenSaveableEditor;
             if (e.Key == Key.W && Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 this.CloseTabSafely(tab);
-            } 
+            }
             else if (e.Key == Key.S && Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 tab.SaveIfModified();
             }
-            else if(Keyboard.Modifiers == ModifierKeys.None || ((e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Back || e.Key == Key.Space))
+            else if (Keyboard.Modifiers == ModifierKeys.None && ((e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Space))
+            {
+                // update saveable state
+                tab.IsDirty = true;
+                tab.UpdateTitle();
+            }
+        }
+
+        // because backspace doesn't trigger KeysDown, somehow
+        private void TabHandleKeysUp(object sender, KeyEventArgs e)
+        {
+            MugenSaveableEditor tab = sender as MugenSaveableEditor;
+            if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.Back)
             {
                 // update saveable state
                 tab.IsDirty = true;
