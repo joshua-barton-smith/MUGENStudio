@@ -46,6 +46,7 @@ namespace MUGENStudio.Graphic
             string content = editor.Text;
             // save contents
             this.BackingFile.WriteFileContents(content);
+            this.BackingFile.Reparse();
             // update title
             this.IsDirty = false;
             this.UpdateTitle();

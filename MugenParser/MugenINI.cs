@@ -69,5 +69,10 @@ namespace MUGENStudio.MugenParser
         {
             File.WriteAllText(this.FilePath, content, this.encoding);
         }
+
+        internal void Reparse()
+        {
+            this.backing = new SimpleINI(this.FilePath, false);
+        }
     }
 }

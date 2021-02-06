@@ -32,6 +32,7 @@ namespace MUGENStudio.Graphic
     {
         private readonly LinkedList<TabItem> closedTabs;
         private CompletionWindow completionWindow;
+        private bool tabWasClosed = false;
         /// <summary>
         /// constructs the editor window
         /// </summary>
@@ -167,7 +168,7 @@ namespace MUGENStudio.Graphic
                         Content = editor
                     };
                     // add keyboard handler for shortcuts
-                    newItem.AddHandler(KeyDownEvent, new KeyEventHandler(TabHandleKeys));
+                    newItem.AddHandler(KeyUpEvent, new KeyEventHandler(TabHandleKeys));
                     editorTabs.Items.Add(newItem);
                     newItem.Focus();
                 }
@@ -192,6 +193,11 @@ namespace MUGENStudio.Graphic
         private void HandleEditorAutoCompletion(object sender, TextCompositionEventArgs e)
         {
             if (completionWindow != null) return;
+            if (tabWasClosed)
+            {
+                tabWasClosed = false;
+                return;
+            }
             // fetch the input so far
             string input = e.Text;
             // fetch the tab text up to cursor position
@@ -515,7 +521,7 @@ namespace MUGENStudio.Graphic
             {
                 tab.SaveIfModified();
             }
-            else if(Keyboard.Modifiers == ModifierKeys.None || e.Key == Key.Back)
+            else if(Keyboard.Modifiers == ModifierKeys.None || ((e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || e.Key == Key.Back || e.Key == Key.Space))
             {
                 // update saveable state
                 tab.IsDirty = true;
@@ -552,7 +558,7 @@ namespace MUGENStudio.Graphic
             // wicked unsafe, please check for null later
             MenuItem item = sender as MenuItem;
             ContextMenu menu = item.Parent as ContextMenu;
-            TabItem tab = menu.PlacementTarget as TabItem;
+            MugenSaveableEditor tab = menu.PlacementTarget as MugenSaveableEditor;
             this.CloseTabSafely(tab);
         }
 
@@ -564,19 +570,61 @@ namespace MUGENStudio.Graphic
         }
 
         // safely closes a tab and adds it to history
-        private void CloseTabSafely(TabItem tab)
+        private void CloseTabSafely(MugenSaveableEditor tab)
         {
-            // we should have a confirmation popup if contents havent been saved
-            editorTabs.Items.Remove(tab);
-            // push to recently-closed stack
-            closedTabs.AddFirst(tab);
-            // cap at 20
-            while (closedTabs.Count > 20)
+            if (tab.IsDirty)
             {
-                closedTabs.RemoveLast();
+                // confirmation popup for save
+                string messageBoxText = string.Format("Do you want to save changes to {0} before closing?", tab.BackingFile.FileKey);
+                string caption = "Code Editor";
+                MessageBoxButton button = MessageBoxButton.YesNoCancel;
+                MessageBoxImage icon = MessageBoxImage.Warning;
+
+                // display
+                MessageBoxResult res = MessageBox.Show(messageBoxText, caption, button, icon);
+
+                // Process message box results
+                switch (res)
+                {
+                    case MessageBoxResult.Yes:
+                        // save changes
+                        tab.SaveIfModified();
+                        goto case MessageBoxResult.No; // c#.......
+                    case MessageBoxResult.No:
+                        // for sync with autocomplete
+                        tabWasClosed = true;
+                        // remove
+                        editorTabs.Items.Remove(tab);
+                        // push to recently-closed stack
+                        closedTabs.AddFirst(tab);
+                        // cap at 20
+                        while (closedTabs.Count > 20)
+                        {
+                            closedTabs.RemoveLast();
+                        }
+                        // refocus
+                        if (editorTabs.Items.Count > 0) ((TabItem)editorTabs.Items.GetItemAt(0)).Focus();
+                        break;
+                    case MessageBoxResult.Cancel:
+                        tab.Focus();
+                        break;
+                }
+            } else
+            {
+                // for sync with autocomplete
+                tabWasClosed = true;
+                // remove
+                editorTabs.Items.Remove(tab);
+                // push to recently-closed stack
+                closedTabs.AddFirst(tab);
+                // cap at 20
+                while (closedTabs.Count > 20)
+                {
+                    closedTabs.RemoveLast();
+                }
+                // refocus
+                if (editorTabs.Items.Count > 0) ((TabItem)editorTabs.Items.GetItemAt(0)).Focus();
             }
-            // refocus
-            if (editorTabs.Items.Count > 0) ((TabItem)editorTabs.Items.GetItemAt(0)).Focus();
         }
 
         // globally-active key shortcuts go here
