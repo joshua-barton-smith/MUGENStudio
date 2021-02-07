@@ -291,7 +291,7 @@ namespace MUGENStudio.Graphic
                 {
                     case "statedef":
                         // show only statedef-relevant props
-                        List<ValidProperty> defProps = Globals.validator.GetStatedefProperties();
+                        List<ValidProperty> defProps = Globals.stateValidator.GetStatedefProperties();
                         completionWindow = new CompletionWindow(editor.TextArea)
                         {
                             StartOffset = start + lineStart,
@@ -311,9 +311,9 @@ namespace MUGENStudio.Graphic
                         break;
                     case "state":
                         // show only state-relevant props
-                        List<ValidProperty> stateProps = Globals.validator.GetStateProperties();
+                        List<ValidProperty> stateProps = Globals.stateValidator.GetStateProperties();
                         // fetch sctrl-relevant props if type can be identified, otherwise this will be empty
-                        List<ValidProperty> sctrlProps = Globals.validator.GetControllerProperties(this.FindSctrlForPos(lineStart).ToLower());
+                        List<ValidProperty> sctrlProps = Globals.stateValidator.GetControllerProperties(this.FindSctrlForPos(lineStart).ToLower());
                         // remove `type` from state props if we found an sctrl (i.e. is already defined)
                         if (sctrlProps.Count > 0)
                         {
@@ -353,11 +353,11 @@ namespace MUGENStudio.Graphic
                 switch (section.ToLower())
                 {
                     case "statedef":
-                        defProps = Globals.validator.GetStatedefProperties();
+                        defProps = Globals.stateValidator.GetStatedefProperties();
                         break;
                     case "state":
-                        defProps = Globals.validator.GetStateProperties();
-                        defProps = defProps.Concat(Globals.validator.GetControllerProperties(this.FindSctrlForPos(lineStart).ToLower())).ToList();
+                        defProps = Globals.stateValidator.GetStateProperties();
+                        defProps = defProps.Concat(Globals.stateValidator.GetControllerProperties(this.FindSctrlForPos(lineStart).ToLower())).ToList();
                         break;
                 }
                 if(defProps.Any(x => x.Name.ToLower().Equals(propName)))

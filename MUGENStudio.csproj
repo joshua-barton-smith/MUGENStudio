@@ -100,6 +100,7 @@
     <Compile Include="MugenParser\Sprites\SFF2File.cs" />
     <Compile Include="MugenParser\Sprites\SpriteFile.cs" />
     <Compile Include="MugenParser\Validation\StateValidator.cs" />
+    <Compile Include="MugenParser\Validation\ValidationError.cs" />
     <Compile Include="MugenParser\Validation\ValidController.cs" />
     <Compile Include="MugenParser\Validation\ValidProperty.cs" />
     <Compile Include="MugenParser\Validation\ValidSection.cs" />

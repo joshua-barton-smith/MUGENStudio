@@ -145,6 +145,17 @@ namespace MUGENStudio.MugenParser
         }
 
         /// <summary>
+        /// returns a copy of the backing list of sections.
+        /// </summary>
+        /// <returns></returns>
+        public List<SimpleINISection> GetAllSections()
+        {
+            SimpleINISection[] sects = new SimpleINISection[this.sections.Count];
+            this.sections.CopyTo(sects);
+            return sects.ToList();
+        }
+
+        /// <summary>
         /// fetches the first section with a matching name
         /// </summary>
         /// <param name="name">section name to find</param>

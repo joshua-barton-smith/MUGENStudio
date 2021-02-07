@@ -230,8 +230,8 @@ namespace MUGENStudio.MugenParser.Validation
         /// <returns></returns>
         public List<ValidProperty> GetControllerProperties(string sctrl)
         {
-            if (!controllers.Any(x => x.Key.ToLower().Equals(sctrl))) return new List<ValidProperty>();
-            return this.controllers.First(x => x.Key.ToLower().Equals(sctrl)).Value.GetProperties();
+            if (!controllers.Any(x => x.Key.Equals(sctrl, StringComparison.InvariantCultureIgnoreCase))) return new List<ValidProperty>();
+            return this.controllers.First(x => x.Key.Equals(sctrl, StringComparison.InvariantCultureIgnoreCase)).Value.GetProperties();
         }
     }
 }

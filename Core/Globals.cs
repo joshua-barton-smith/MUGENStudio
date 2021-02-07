@@ -29,6 +29,6 @@ namespace MUGENStudio.Core
         /// <summary>
         /// validator for statedef and state controllers
         /// </summary>
-        public static StateValidator validator = new StateValidator();
+        public static StateValidator stateValidator = new StateValidator();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MUGENStudio.Core;
 using MUGENStudio.MugenParser;
+using MUGENStudio.MugenParser.Validation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -55,6 +56,15 @@ namespace MUGENStudio.MugenParser
         /// Set of statefiles for the character, along with their numbering in the DEF
         /// </summary>
         public Dictionary<string, MugenST> StateFiles { get; }
+
+        /// <summary>
+        /// stores a list of all validation errors across all files
+        /// </summary>
+        public List<ValidationError> ValidationErrors { get; }
+        /// <summary>
+        /// maps statedef numbers to the first ST file they appear in.
+        /// </summary>
+        public Dictionary<int, string> StatedefMapping { get; }
 
         /// <summary>
         /// DEF file for the character
@@ -128,13 +138,29 @@ namespace MUGENStudio.MugenParser
             // 3. Arcade section -- TODO
 
             // validates the project, checks syntax errors, etc
+            this.StatedefMapping = new Dictionary<int, string>();
+            this.ValidationErrors = new List<ValidationError>();
             this.ValidateProject();
         }
 
         // function to validate syntax/structure of files in the project
         private void ValidateProject()
         {
+            //
+            this.StateFiles["st"].Validate(this);
+            foreach (var st in this.StateFiles)
+            {
+                if (!st.Key.Equals("st"))
+                {
+                    st.Value.Validate(this, st.Key);
+                }
+            }
+            this.CommonFile.Validate(this, "stcommon", true);
 
+            foreach(var x in this.ValidationErrors)
+            {
+                if((int)x.sev >= (int)Globals.settingsSingleton.ShowSeverity) Trace.WriteLine(x.message);
+            }
         }
 
         // converts a filepath given in the DEF (e.g. `stcommon = mycommon.cns`) to an absolute path based on DEF file location

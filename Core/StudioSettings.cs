@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using MUGENStudio.MugenParser.Validation;
 
 namespace MUGENStudio.Core
 {
@@ -22,6 +23,11 @@ namespace MUGENStudio.Core
         /// is code completion enabled?
         /// </summary>
         public bool EnableCodeCompletion { get; }
+
+        /// <summary>
+        /// lowest severity of errors to show
+        /// </summary>
+        public ValidationSeverity ShowSeverity { get; }
 
         // internal xml document representation
         private XDocument settingsDoc;
@@ -60,6 +66,11 @@ namespace MUGENStudio.Core
                 this.EnableCodeCompletion = Boolean.Parse(this.settingsDoc.Element("mugenSettings").Element("codeCompletion").Attribute("value").Value);
             else
                 this.EnableCodeCompletion = true;
+
+            if (this.settingsDoc.Element("mugenSettings").Element("syntaxChecking") != null)
+                this.ShowSeverity = (ValidationSeverity) Int32.Parse(this.settingsDoc.Element("mugenSettings").Element("syntaxChecking").Attribute("severity").Value);
+            else
+                this.ShowSeverity = ValidationSeverity.WARNING;
         }
 
         /// <summary>
@@ -121,6 +132,9 @@ namespace MUGENStudio.Core
                     new XElement("previousProjects"),
                     new XElement("codeCompletion",
                         new XAttribute("value", "true")
+                    ),
+                    new XElement("syntaxChecking",
+                        new XAttribute("severity", (int) ValidationSeverity.WARNING)
                     )
                 )
             );

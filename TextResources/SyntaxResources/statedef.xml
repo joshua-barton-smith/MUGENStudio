@@ -4,6 +4,8 @@
 		<value val="S"/>
 		<value val="C"/>
 		<value val="A"/>
+		<value val="L"/>
+		<value val="U"/>
 	</property>
 	<property name="movetype" type="enum" optional="true">
 		<value val="A"/>

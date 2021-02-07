@@ -59,6 +59,13 @@ namespace MUGENStudio.MugenParser
             return this.backing.GetNamedProperty(section.ToLower(), key.ToLower());
         }
 
+
+        /// <summary>
+        /// exists to be overridden by subclasses.
+        /// validate the parsed INI file against syntax rules.
+        /// </summary>
+        public virtual void Validate(MugenDefinition project) { }
+
         // gets the raw file contents
         internal string GetFileRawContents()
         {
