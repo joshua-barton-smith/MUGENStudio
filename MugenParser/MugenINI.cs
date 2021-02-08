@@ -65,6 +65,7 @@ namespace MUGENStudio.MugenParser
         /// validate the parsed INI file against syntax rules.
         /// </summary>
         public virtual void Validate(MugenDefinition project) { }
+        public virtual void Validate(MugenDefinition project, string stName) { }
 
         // gets the raw file contents
         internal string GetFileRawContents()

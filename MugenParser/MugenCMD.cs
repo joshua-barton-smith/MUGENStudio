@@ -20,5 +20,12 @@ namespace MUGENStudio.MugenParser
         public MugenCMD(string path, string fileKey) : base(path, fileKey)
         {
         }
+
+        public override void Validate(MugenDefinition project)
+        {
+            // validate states with an anonymous MugenST
+            MugenST tmp = new MugenST(this.FilePath, this.FileKey);
+            tmp.Validate(project, "cmd", false);
+        }
     }
 }

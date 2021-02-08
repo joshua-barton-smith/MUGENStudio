@@ -24,6 +24,8 @@ namespace MUGENStudio.Graphic
         /// backing file for this tab
         /// </summary>
         public MugenINI BackingFile { get; set; }
+        public int ProjectID { get; set; }
+        public int StartLine { get; set; }
 
         /// <summary>
         /// updates title based on whether the file is modified or not.

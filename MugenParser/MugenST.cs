@@ -28,7 +28,7 @@ namespace MUGENStudio.MugenParser
             this.Validate(project, "st");
         }
 
-        public void Validate(MugenDefinition project, string stName)
+        public override void Validate(MugenDefinition project, string stName)
         {
             this.Validate(project, stName, false);
         }
@@ -50,17 +50,14 @@ namespace MUGENStudio.MugenParser
                     currentStatedef = Int32.Parse(statedefSplit[1]);
                     // validate statedef...
                     // 1. check if statedef already exists, if not common states
-                    if (!isCommon)
+                    if (project.StatedefMapping.ContainsKey(currentStatedef) && !isCommon)
                     {
-                        if (project.StatedefMapping.ContainsKey(currentStatedef))
-                        {
-                            ValidationError err = new ValidationError(string.Format("Statedef {0} in file {1} already defined in file {2}!", currentStatedef, this.FileKey, project.StateFiles[project.StatedefMapping[currentStatedef]].FileKey), ValidationSeverity.INFO);
-                            project.ValidationErrors.Add(err);
-                        }
-                        else
-                        {
-                            project.StatedefMapping.Add(currentStatedef, stName);
-                        }
+                        ValidationError err = new ValidationError(string.Format("Statedef {0} in file {1} already defined in file {2}!", currentStatedef, this.FileKey, project.StateFiles[project.StatedefMapping[currentStatedef]].FileKey), ValidationSeverity.INFO);
+                        project.ValidationErrors.Add(err);
+                    }
+                    else if (!project.StatedefMapping.ContainsKey(currentStatedef))
+                    {
+                        project.StatedefMapping.Add(currentStatedef, stName);
                     }
                     // 2. check statedef params for validity
                     foreach(var kv in section.Keys)

@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
+using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MUGENStudio.Core;
@@ -11,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +35,7 @@ namespace MUGENStudio.Graphic
         private readonly LinkedList<TabItem> closedTabs;
         private CompletionWindow completionWindow;
         private bool tabWasClosed = false;
+        private static readonly Regex ws = new Regex(@"\s+");
         /// <summary>
         /// constructs the editor window
         /// </summary>
@@ -61,8 +64,10 @@ namespace MUGENStudio.Graphic
             // empty the tree
             projectTree.Items.Clear();
             // add project files to the display
-            foreach (MugenDefinition project in Globals.projects)
+            for (int i = 0; i < Globals.projects.Count; i++)
             {
+                // so we can access index as `i`...
+                MugenDefinition project = Globals.projects[i];
                 // root element
                 TreeViewItem proj = new TreeViewItem()
                 {
@@ -99,12 +104,13 @@ namespace MUGENStudio.Graphic
                 common.AddHandler(MouseDoubleClickEvent, new MouseButtonEventHandler(OpenOrFocusEditorTab));
                 st.Items.Add(common);
                 // add all statefiles
-                foreach (KeyValuePair<string, MugenST> states in project.StateFiles)
+                foreach (KeyValuePair<string, MugenINI> states in project.StateFiles)
                 {
                     MugenTreeViewItem tmp = new MugenTreeViewItem()
                     {
                         Header = string.Format("{0} {1}", states.Key.ToUpper(), states.Value.FileKey),
-                        BackingFile = states.Value
+                        BackingFile = states.Value,
+                        ProjectID = i
                     };
                     tmp.AddHandler(MouseDoubleClickEvent, new MouseButtonEventHandler(OpenOrFocusEditorTab));
                     st.Items.Add(tmp);
@@ -136,43 +142,201 @@ namespace MUGENStudio.Graphic
                 // otherwise, create a new tab
                 if (!exists)
                 {
-                    // contextmenu to easily close the tab
-                    ContextMenu tabContext = new ContextMenu();
-                    MenuItem closeTab = new MenuItem()
-                    {
-                        Header = "Close Tab"
-                    };
-                    closeTab.Click += new RoutedEventHandler(CloseTab);
-                    tabContext.Items.Add(closeTab);
-
-                    // initialize the INI highlighter
-                    XmlReader iniReader = XmlReader.Create("TextResources/Highlighters/INIHighlight.xshd");
-
-                    // avalon editor containing file contents + syntax highlighter
-                    TextEditor editor = new TextEditor()
-                    {
-                        Text = item.GetBackingFileContents(),
-                        SyntaxHighlighting = HighlightingLoader.Load(iniReader, HighlightingManager.Instance)
-                    };
-
-                    // setup for code completion
-                    if(Globals.settingsSingleton.EnableCodeCompletion) editor.TextArea.TextEntered += HandleEditorAutoCompletion;
-                    if (Globals.settingsSingleton.EnableCodeCompletion) editor.TextArea.TextEntering += HandleEditorAutoCompletionSubmit;
-
-                    // insert the tab with the editor as its contents
-                    MugenSaveableEditor newItem = new MugenSaveableEditor()
-                    {
-                        Header = item.BackingFile.FileKey,
-                        BackingFile = item.BackingFile,
-                        ContextMenu = tabContext,
-                        Content = editor
-                    };
-                    // add keyboard handler for shortcuts
-                    newItem.AddHandler(KeyDownEvent, new KeyEventHandler(TabHandleKeysDown));
-                    newItem.AddHandler(KeyUpEvent, new KeyEventHandler(TabHandleKeysUp));
-                    editorTabs.Items.Add(newItem);
-                    newItem.Focus();
+                    this.OpenTabSafely(item);
                 }
+            }
+        }
+
+        // used to allow follow-through ChangeStates/SelfStates
+        private void HandleEditorMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // check for ctrl+click
+            if (e.LeftButton == MouseButtonState.Pressed && Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                // get editor instance
+                MugenSaveableEditor tab = sender as MugenSaveableEditor;
+                TextEditor editor = tab.Content as TextEditor;
+                // find position of pointer
+                TextViewPosition? pos_ = editor.GetPositionFromPoint(e.GetPosition(editor));
+                if (pos_.HasValue)
+                {
+                    TextViewPosition pos = pos_.Value;
+                    // find text under cursor
+                    int off = editor.TextArea.Document.GetLineByNumber(pos.Line).Offset;
+                    string line = editor.TextArea.Document.GetText(off, editor.TextArea.Document.GetLineByNumber(pos.Line).NextLine.Offset - off);
+                    // check type of section
+                    string section = this.FindSectionForPos(off);
+                    if (!section.Equals("state", StringComparison.InvariantCultureIgnoreCase)) return;
+                    // check type of sctrl
+                    string sctrl = this.FindSctrlForPos(off);
+                    if (!sctrl.Equals("changestate", StringComparison.InvariantCultureIgnoreCase) && !sctrl.Equals("selfstate", StringComparison.InvariantCultureIgnoreCase)) return;
+                    // check line starting
+                    if (!ws.Replace(line, "").StartsWith("value=")) return;
+                    // get the value, trying to escape comments as well.
+                    string possibleState = ws.Replace(line, "").Split('=')[1].Split(';')[0].Trim();
+                    try
+                    {
+                        // try to parse
+                        int gotoState = Int32.Parse(possibleState);
+                        // try to find in the statedef map
+                        if (!Globals.projects[tab.ProjectID].StatedefMapping.ContainsKey(gotoState)) return;
+                        MugenINI location = Globals.projects[tab.ProjectID].StateFiles.First(x => x.Key.Equals(Globals.projects[tab.ProjectID].StatedefMapping[gotoState])).Value;
+                        // see if tab is already opened
+                        bool isOpen = false;
+                        foreach (MugenSaveableEditor editorTab in editorTabs.Items)
+                        {
+                            if (editorTab.Header.ToString().Equals(location.FileKey))
+                            {
+                                editorTab.Focus();
+                                isOpen = true;
+                            }
+                        }
+                        // open it if it isn't
+                        if (!isOpen)
+                        {
+                            this.OpenTabSafely(new MugenTreeViewItem()
+                            {
+                                BackingFile = location,
+                                ProjectID = tab.ProjectID
+                            });
+                        }
+                        // jump to the correct position in the tab
+                        MugenSaveableEditor tabToFind = null;
+                        foreach (MugenSaveableEditor editorTab in editorTabs.Items)
+                        {
+                            if (editorTab.Header.ToString().Equals(location.FileKey))
+                            {
+                                tabToFind = editorTab;
+                                break;
+                            }
+                        }
+                        // ref to avalonedit object
+                        TextEditor editorToFind = tabToFind.Content as TextEditor;
+                        // search for line of statedef
+                        int lineNum = this.SearchForStatedef(editorToFind.Text, gotoState);
+                        // set position
+                        editorToFind.ScrollTo(lineNum, 0);
+                        tabToFind.StartLine = lineNum;
+                        tabToFind.Loaded += UpdateLineSaveableEditor;
+                    } catch
+                    {
+                        // error parsing so give up
+                        return;
+                    }
+                }
+            }
+        }
+
+        // finds a state in the text and returns the line number
+        private int SearchForStatedef(string text, int gotoState)
+        {
+            string ttmp = text.ToLower();
+            // ty to https://stackoverflow.com/questions/1547476/easiest-way-to-split-a-string-on-newlines-in-net
+            string[] lines = ttmp.Split(
+                new[] { "\r\n", "\r", "\n" },
+                StringSplitOptions.None
+            );
+            // iterate through
+            for (int i = 0; i < lines.Length; i++)
+            {
+                // easy skip
+                if (!lines[i].Contains("statedef")) continue;
+                string line = lines[i];
+                // iterate chars to try and find
+                bool openSd = false;
+                string cont = "";
+                bool found = false;
+                foreach(char c in line.ToCharArray())
+                {
+                    if (c == '[')
+                    {
+                        // open search
+                        openSd = true;
+                    } else if (c == ']')
+                    {
+                        // close and complete search
+                        openSd = false;
+                        found = true;
+                        break;
+                    } else if (c == ';')
+                    {
+                        // break early
+                        found = false;
+                        break;
+                    } else if (openSd)
+                    {
+                        cont += c;
+                    }
+                }
+                if (found)
+                {
+                    // found the statedef tag, so inspect it
+                    if (!cont.StartsWith("statedef")) continue; // quick drop
+                    cont = cont.Replace("statedef", ""); // drop statedef
+                    cont = cont.Trim().Split(',')[0].Trim(); // *should* return state number
+                    int arriveState = Int32.Parse(cont);
+                    if (arriveState == gotoState) return i;
+                }
+            }
+            return 0;
+        }
+
+        private void OpenTabSafely(MugenTreeViewItem item)
+        {
+            // contextmenu to easily close the tab
+            ContextMenu tabContext = new ContextMenu();
+            MenuItem closeTab = new MenuItem()
+            {
+                Header = "Close Tab"
+            };
+            closeTab.Click += new RoutedEventHandler(CloseTab);
+            tabContext.Items.Add(closeTab);
+
+            // initialize the INI highlighter
+            XmlReader iniReader = XmlReader.Create("TextResources/Highlighters/INIHighlight.xshd");
+
+            // avalon editor containing file contents + syntax highlighter
+            TextEditor editor = new TextEditor()
+            {
+                Text = item.GetBackingFileContents(),
+                SyntaxHighlighting = HighlightingLoader.Load(iniReader, HighlightingManager.Instance),
+                ShowLineNumbers = true
+            };
+
+            // setup for code completion
+            if (Globals.settingsSingleton.EnableCodeCompletion) editor.TextArea.TextEntered += HandleEditorAutoCompletion;
+            if (Globals.settingsSingleton.EnableCodeCompletion) editor.TextArea.TextEntering += HandleEditorAutoCompletionSubmit;
+
+            // insert the tab with the editor as its contents
+            MugenSaveableEditor newItem = new MugenSaveableEditor()
+            {
+                Header = item.BackingFile.FileKey,
+                BackingFile = item.BackingFile,
+                ContextMenu = tabContext,
+                Content = editor,
+                ProjectID = item.ProjectID
+            };
+            // add keyboard handler for shortcuts
+            newItem.AddHandler(KeyDownEvent, new KeyEventHandler(TabHandleKeysDown));
+            newItem.AddHandler(KeyUpEvent, new KeyEventHandler(TabHandleKeysUp));
+            // allow follow-through ChangeState and SelfState
+            newItem.PreviewMouseDown += HandleEditorMouseDown;
+            editorTabs.Items.Add(newItem);
+            newItem.Focus();
+        }
+
+        private void UpdateLineSaveableEditor(object sender, EventArgs e)
+        {
+            MugenSaveableEditor editor = sender as MugenSaveableEditor;
+            TextEditor e1 = editor.Content as TextEditor;
+            if (editor.StartLine != -1)
+            {
+                e1.ScrollTo(editor.StartLine, 0);
+                int start = e1.TextArea.Document.GetOffset(new TextLocation(editor.StartLine + 1, 0));
+                int end = e1.TextArea.Document.GetOffset(new TextLocation(editor.StartLine + 2, 0));
+                e1.Select(start, end - start);
+                e1.CaretOffset = start;
+                e1.Focus();
             }
         }
 

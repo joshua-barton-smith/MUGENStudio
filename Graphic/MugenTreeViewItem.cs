@@ -13,6 +13,8 @@ namespace MUGENStudio.Graphic
         /// the backing MugenINI object for this tree item
         /// </summary>
         public MugenINI BackingFile { get; set; }
+        public int ProjectID { get; set; }
+
         /// <summary>
         /// 
         /// </summary>

@@ -55,7 +55,7 @@ namespace MUGENStudio.MugenParser
         /// <summary>
         /// Set of statefiles for the character, along with their numbering in the DEF
         /// </summary>
-        public Dictionary<string, MugenST> StateFiles { get; }
+        public Dictionary<string, MugenINI> StateFiles { get; }
 
         /// <summary>
         /// stores a list of all validation errors across all files
@@ -115,7 +115,7 @@ namespace MUGENStudio.MugenParser
             // load st files
             // st + st0~9 at most
             // st seems to process first
-            this.StateFiles = new Dictionary<string, MugenST>();
+            this.StateFiles = new Dictionary<string, MugenINI>();
             if (this.GetValueWithFallback("Files", "st", null) != null)
             {
                 this.StateFiles.Add("st", new MugenST(this.RelativePathToDef(path, this.GetValueWithFallback("Files", "st", null)), this.GetValueWithFallback("Files", "st", null)));
@@ -146,7 +146,7 @@ namespace MUGENStudio.MugenParser
         // function to validate syntax/structure of files in the project
         private void ValidateProject()
         {
-            //
+            // for statedef loading, st>st0~9>cmd>common
             this.StateFiles["st"].Validate(this);
             foreach (var st in this.StateFiles)
             {
@@ -155,7 +155,11 @@ namespace MUGENStudio.MugenParser
                     st.Value.Validate(this, st.Key);
                 }
             }
+            // basically same as ST validation
+            this.CmdFile.Validate(this);
+            this.StateFiles.Add("cmd", this.CmdFile);
             this.CommonFile.Validate(this, "stcommon", true);
+            this.StateFiles.Add("stcommon", this.CommonFile);
 
             foreach(var x in this.ValidationErrors)
             {
